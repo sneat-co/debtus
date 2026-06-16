@@ -1,0 +1,11 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>sneat-co/sneat-renovate-nx"],
+  "packageRules": [
+    {
+      "description": "Don't update this repo's own published @sneat/ext-debtus-* packages (consumed locally via workspace/peer)",
+      "matchPackageNames": ["@sneat/ext-debtus-shared", "@sneat/ext-debtus-internal"],
+      "enabled": false
+    }
+  ]
+}
