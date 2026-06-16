@@ -1,0 +1,40 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  go-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          # No external deps yet, so no go.sum — disable module caching to avoid
+          # "paths not resolved" errors. Re-enable with cache-dependency-path
+          # once backend/go.sum exists.
+          cache: false
+
+      - name: Go CI (get, vet, build, test, lint)
+        uses: strongo/go-ci-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: backend
+          # Versioning is managed by the frontend (Nx Release); don't tag the repo here.
+          push_tag: 'false'
