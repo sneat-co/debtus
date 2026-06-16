@@ -1,0 +1,23 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sneat/ext-debtus-shared": ["libs/ext-debtus-shared/src/index.ts"],
+      "@sneat/ext-debtus-internal": ["libs/ext-debtus-internal/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
