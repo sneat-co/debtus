@@ -15,6 +15,11 @@ import (
 
 const moduleID = const4splitus.ModuleID
 
+// Extension exposes the splitus extension config (alias of Module).
+func Extension() extension.Config {
+	return Module()
+}
+
 func Module() extension.Config {
 	return extension.NewExtension(moduleID,
 		extension.RegisterRoutes(func(handle extension.HTTPHandleFunc) {
