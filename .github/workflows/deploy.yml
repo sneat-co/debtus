@@ -2,8 +2,9 @@ name: Deploy debtus-app
 
 # Builds debtus-app and deploys it to the Firebase Hosting "debtusapp" site
 # (project sneat-eur3-1, custom domain debtus.app).
-# Requires repo secret FIREBASE_SERVICE_ACCOUNT_SNEAT_EUR3_1 — a Firebase
-# service-account JSON with the Firebase Hosting Admin role.
+#
+# Auth is keyless via Workload Identity Federation (the org disables SA JSON
+# keys): GitHub OIDC -> GCP service account github-debtus-deploy. No secrets.
 
 on:
   workflow_dispatch:
@@ -17,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -46,10 +48,11 @@ jobs:
         working-directory: frontend
         run: pnpm exec nx build debtus-app
 
-      - name: Deploy to Firebase Hosting (live)
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNEAT_EUR3_1 }}
-          projectId: sneat-eur3-1
-          channelId: live
+          workload_identity_provider: projects/588648831063/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-debtus-deploy@sneat-eur3-1.iam.gserviceaccount.com
+
+      - name: Deploy to Firebase Hosting (live)
+        run: npx --yes firebase-tools@15 deploy --only hosting --project sneat-eur3-1 --non-interactive
