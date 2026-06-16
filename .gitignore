@@ -1,0 +1,17 @@
+# Root-level ignores (frontend/ and backend/ have their own as needed)
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Go
+/backend/bin/
+/backend/dist/
+*.test
+*.out
+
+# Node (frontend has its own .gitignore too)
+node_modules/
+dist/
+.nx/cache
+.nx/workspace-data
