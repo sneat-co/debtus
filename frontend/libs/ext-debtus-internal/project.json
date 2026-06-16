@@ -1,0 +1,39 @@
+{
+  "name": "ext-debtus-internal",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ext-debtus-internal/src",
+  "prefix": "sneat-debtus",
+  "projectType": "library",
+  "release": {
+    "version": {
+      "manifestRootsToUpdate": ["dist/{projectRoot}"],
+      "currentVersionResolver": "git-tag",
+      "fallbackCurrentVersionResolver": "disk"
+    }
+  },
+  "tags": ["type:lib", "scope:debtus"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/ext-debtus-internal/ng-package.json",
+        "tsConfig": "libs/ext-debtus-internal/tsconfig.lib.json"
+      },
+      "configurations": {
+        "production": { "tsConfig": "libs/ext-debtus-internal/tsconfig.lib.prod.json" },
+        "development": {}
+      },
+      "defaultConfiguration": "production"
+    },
+    "nx-release-publish": { "options": { "packageRoot": "dist/{projectRoot}" } },
+    "test": {
+      "executor": "@nx/angular:unit-test",
+      "options": {
+        "watch": false,
+        "runnerConfig": "libs/ext-debtus-internal/vitest.config.ts"
+      }
+    },
+    "lint": { "executor": "@nx/eslint:lint" }
+  }
+}
