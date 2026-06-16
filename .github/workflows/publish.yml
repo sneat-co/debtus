@@ -1,0 +1,58 @@
+name: Publish packages
+
+# Manual, controlled publish of the debtus extension packages to npm.
+# Requires repo secret NPM_TOKEN (a granular/automation token with publish
+# rights on the @sneat scope — automation tokens bypass 2FA/OTP).
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (build + npm publish --dry-run, no actual publish)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm exec nx run-many -t build --projects=ext-debtus-shared,ext-debtus-internal
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "DRY RUN — no packages will be published"
+            npm publish dist/libs/ext-debtus-shared --access public --dry-run
+            npm publish dist/libs/ext-debtus-internal --access public --dry-run
+          else
+            npm publish dist/libs/ext-debtus-shared --access public
+            npm publish dist/libs/ext-debtus-internal --access public
+          fi
