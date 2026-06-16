@@ -1,0 +1,14 @@
+package cmds4splitusbot
+
+type callbackLink struct {
+}
+
+var CallbackLink = callbackLink{}
+
+func (callbackLink) ToGroup(groupID string, isEdit bool) string {
+	s := groupCommandCode + "?id=" + groupID
+	if isEdit {
+		s += "&edit=1"
+	}
+	return s
+}
