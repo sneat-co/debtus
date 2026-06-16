@@ -14,6 +14,7 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/update"
+	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
@@ -172,7 +173,11 @@ func sendReceiptBySms(whc botsfw.WebhookContext, tx dal.ReadwriteTransaction, sp
 
 	receiptUrl := common4debtus.GetReceiptUrl(receipt.ID, common4debtus.GetWebsiteHost(receiptData.CreatedOnID))
 
-	if counterparty.Data.CounterpartyUserID == "" {
+	stdContact, err := dal4contactus.GetContactByID(ctx, tx, spaceID, counterparty.ID)
+	if err != nil {
+		return m, err
+	}
+	if stdContact.Data.GetUserID() == "" {
 		//related := fmt.Sprintf("%v=%v", models.TransfersCollection, transferID)
 		//inviteKey, invite, err := invites.CreatePersonalInvite(whc, whc.AppUserID(), invites.InviteBySms, strconv.FormatInt(phoneContact.PhoneNumber, 10), whc.BotPlatform().ContactID(), whc.GetBotCode(), related)
 		//if err != nil {
@@ -183,7 +188,7 @@ func sendReceiptBySms(whc botsfw.WebhookContext, tx dal.ReadwriteTransaction, sp
 	} else {
 		// TODO: personalize receipt URL via anybot.GetReceiptUrlForUser(...) once that helper is restored.
 		return m, fmt.Errorf("%w: sending SMS receipt to a registered user (counterpartyUserID=%s)",
-			errors.ErrUnsupported, counterparty.Data.CounterpartyUserID)
+			errors.ErrUnsupported, stdContact.Data.GetUserID())
 	}
 
 	// You've got $10 from Jack

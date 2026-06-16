@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
@@ -30,7 +30,7 @@ func newMinimalBillEntity(creatorUserID string) *models4splitus.BillDbo {
 }
 
 // createBillViaTx runs CreateBill in a memory-DB transaction, optionally
-// seeding debtus space contacts first, and returns the CreateBill result.
+// seeding standard contacts first, and returns the CreateBill result.
 func createBillViaTx(t *testing.T, billEntity *models4splitus.BillDbo, contactIDs ...string) (bill models4splitus.BillEntry, createErr error) {
 	t.Helper()
 	ctx := context.Background()
@@ -38,7 +38,7 @@ func createBillViaTx(t *testing.T, billEntity *models4splitus.BillDbo, contactID
 	if len(contactIDs) > 0 {
 		if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 			for _, contactID := range contactIDs {
-				contact := models4debtus.NewDebtusSpaceContactEntry(coretypes.SpaceID(spaceID), contactID, nil)
+				contact := dal4contactus.NewContactEntry(coretypes.SpaceID(spaceID), contactID)
 				if err := tx.Set(ctx, contact.Record); err != nil {
 					return err
 				}
@@ -121,6 +121,58 @@ func TestDeleteBill_And_RestoreBill(t *testing.T) {
 	// Restoring a non-deleted bill returns an error
 	if _, err = RestoreBill(ctx, bill.ID, "u1"); err == nil {
 		t.Error("expected error restoring a non-deleted bill")
+	}
+}
+
+// TestCreateBill_SourcesMemberUserIDFromStandardContact verifies that when a
+// bill member references a contact (and has no UserID yet), CreateBill resolves
+// the member's UserID from the STANDARD contactus contact's UserID.
+func TestCreateBill_SourcesMemberUserIDFromStandardContact(t *testing.T) {
+	ctx := context.Background()
+	db := sneattesting.SetupMemoryDB(t)
+
+	// Seed a standard contact "c1" owned by user "resolved-user".
+	stdContact := dal4contactus.NewContactEntry(coretypes.SpaceID(spaceID), "c1")
+	stdContact.Data.UserID = "resolved-user"
+	stdContact.Data.SetName("full", "Counterparty")
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		return tx.Set(ctx, stdContact.Record)
+	}); err != nil {
+		t.Fatalf("failed to seed standard contact: %v", err)
+	}
+
+	billEntity := newMinimalBillEntity("u1")
+	billEntity.SplitMode = models4splitus.SplitModeEqually
+	if err := billEntity.SetBillMembers([]*briefs4splitus.BillMemberBrief{
+		{
+			MemberBrief: briefs4splitus.MemberBrief{
+				ID:   "m1",
+				Name: "Counterparty",
+				ContactByUser: briefs4splitus.MemberContactBriefsByUserID{
+					"u1": briefs4splitus.MemberContactBrief{ContactID: "c1", ContactName: "Counterparty"},
+				},
+			},
+			Owes: 100,
+			Paid: 100,
+		},
+	}); err != nil {
+		t.Fatalf("SetBillMembers failed: %v", err)
+	}
+
+	var bill models4splitus.BillEntry
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
+		bill, err = CreateBill(ctx, tx, spaceID, billEntity)
+		return err
+	}); err != nil {
+		t.Fatalf("CreateBill failed: %v", err)
+	}
+
+	members := bill.Data.GetBillMembers()
+	if len(members) != 1 {
+		t.Fatalf("expected 1 member, got %d", len(members))
+	}
+	if got := members[0].UserID; got != "resolved-user" {
+		t.Errorf("member.UserID = %q, want %q (sourced from standard contact)", got, "resolved-user")
 	}
 }
 

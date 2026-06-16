@@ -79,9 +79,7 @@ func (dbo *DebtusSpaceContactDbo) MustMatchCounterparty(counterparty DebtusSpace
 }
 
 type WithCounterpartyFields struct {
-	CounterpartyUserID    string            `json:"counterpartyUserID,omitempty" firestore:"counterpartyUserID,omitempty"`       // The counterparty user UserID if registered
-	CounterpartySpaceID   coretypes.SpaceID `json:"counterpartySpaceID,omitempty" firestore:"counterpartySpaceID,omitempty"`     // The counterparty user SpaceID if registered
-	CounterpartyContactID string            `json:"counterpartyContactID,omitempty" firestore:"counterpartyContactID,omitempty"` // The counterparty user ContactID if registered
+	CounterpartyContactID string `json:"counterpartyContactID,omitempty" firestore:"counterpartyContactID,omitempty"` // The counterparty user ContactID if registered
 }
 
 func (v *WithCounterpartyFields) Validate() error {
@@ -111,7 +109,7 @@ type DebtusSpaceContactDbo struct {
 }
 
 func (dbo *DebtusSpaceContactDbo) String() string {
-	return fmt.Sprintf("DebtusSpaceContactEntry{CounterpartyUserID: %s, CounterpartyContactID: %s, Status: %s, ContactDetails: %v, LastTransferAt: %v}", dbo.CounterpartyUserID, dbo.CounterpartyContactID, dbo.Status, dbo.ContactDetails, dbo.LastTransferAt)
+	return fmt.Sprintf("DebtusSpaceContactEntry{CounterpartyContactID: %s, Status: %s, ContactDetails: %v, LastTransferAt: %v}", dbo.CounterpartyContactID, dbo.Status, dbo.ContactDetails, dbo.LastTransferAt)
 }
 
 func (dbo *DebtusSpaceContactDbo) GetTransfersInfo() (transfersInfo *UserContactTransfersInfo) {

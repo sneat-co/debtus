@@ -16,9 +16,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus/dto4debtus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/facade4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
@@ -27,7 +25,6 @@ import (
 
 // Seams for testing — allows tests to replace with stubs without a real database.
 var getBillByID = facade4splitus.GetBillByID
-var getDebtusSpaceContactsByIDs = facade4debtus.GetDebtusSpaceContactsByIDs
 var getContactsByIDs = dal4contactus.GetContactsByIDs
 var getUsersByIDs = dal4userus.GetUsersByIDs
 var createBill = facade4splitus.CreateBill
@@ -110,15 +107,8 @@ func handleCreateBill(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	var (
-		debtusContacts []models4debtus.DebtusSpaceContactEntry
-		contacts       []dal4contactus.ContactEntry
-	)
+	var contacts []dal4contactus.ContactEntry
 	if len(contactIDs) > 0 {
-		if debtusContacts, err = getDebtusSpaceContactsByIDs(ctx, nil, spaceID, contactIDs); err != nil {
-			common4all.InternalError(ctx, w, err)
-			return
-		}
 		if contacts, err = getContactsByIDs(ctx, nil, spaceID, contactIDs); err != nil {
 			common4all.InternalError(ctx, w, err)
 			return
@@ -150,10 +140,9 @@ func handleCreateBill(ctx context.Context, w http.ResponseWriter, r *http.Reques
 			Adjustment: member.Adjustment,
 		}
 		if member.ContactID != "" {
-			for contactIndex, debtusContact := range debtusContacts {
-				if debtusContact.ID == member.ContactID {
-					contactName := debtusContact.Data.FullName()
-					contact := contacts[contactIndex]
+			for _, contact := range contacts {
+				if contact.ID == member.ContactID {
+					contactName := contact.Data.GetTitle()
 					billMembers[i].ContactByUser = briefs4splitus.MemberContactBriefsByUserID{
 						contact.Data.UserID: briefs4splitus.MemberContactBrief{
 							ContactID:   member.ContactID,
@@ -166,7 +155,7 @@ func handleCreateBill(ctx context.Context, w http.ResponseWriter, r *http.Reques
 					goto contactFound
 				}
 			}
-			common4all.BadRequestError(ctx, w, fmt.Errorf("debtusContact not found by member.ContactID=%s", member.ContactID))
+			common4all.BadRequestError(ctx, w, fmt.Errorf("contact not found by member.ContactID=%s", member.ContactID))
 			return
 		contactFound:
 		}

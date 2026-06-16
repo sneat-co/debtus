@@ -13,10 +13,8 @@ import (
 	"github.com/dal-go/dalgo/record"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/decimal"
@@ -235,12 +233,6 @@ func TestHandleCreateBill_MemberHasBothIDs(t *testing.T) {
 	}
 	defer func() { getUsersByIDs = origUsers }()
 
-	origContacts := getDebtusSpaceContactsByIDs
-	getDebtusSpaceContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]models4debtus.DebtusSpaceContactEntry, error) {
-		return nil, nil
-	}
-	defer func() { getDebtusSpaceContactsByIDs = origContacts }()
-
 	origGetContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
 		return nil, nil
@@ -261,33 +253,7 @@ func TestHandleCreateBill_MemberHasBothIDs(t *testing.T) {
 	}
 }
 
-func TestHandleCreateBill_GetDebtusContactsError(t *testing.T) {
-	origContacts := getDebtusSpaceContactsByIDs
-	getDebtusSpaceContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]models4debtus.DebtusSpaceContactEntry, error) {
-		return nil, errors.New("debtus contacts db error")
-	}
-	defer func() { getDebtusSpaceContactsByIDs = origContacts }()
-
-	values := url.Values{
-		"split":   {"equally"},
-		"spaceID": {"space1"},
-		"amount":  {"5.00"},
-		"members": {`[{"contactID":"c1","amount":500}]`},
-	}
-	w := httptest.NewRecorder()
-	handleCreateBill(context.Background(), w, makeCreateBillRequest(values), token4auth.AuthInfo{UserID: "user1"})
-	if w.Code != http.StatusInternalServerError {
-		t.Errorf("expected 500, got %d — body: %s", w.Code, w.Body.String())
-	}
-}
-
 func TestHandleCreateBill_GetContactsByIDsError(t *testing.T) {
-	origDebtus := getDebtusSpaceContactsByIDs
-	getDebtusSpaceContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]models4debtus.DebtusSpaceContactEntry, error) {
-		return []models4debtus.DebtusSpaceContactEntry{}, nil
-	}
-	defer func() { getDebtusSpaceContactsByIDs = origDebtus }()
-
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
 		return nil, errors.New("contacts db error")
@@ -308,17 +274,9 @@ func TestHandleCreateBill_GetContactsByIDsError(t *testing.T) {
 }
 
 func TestHandleCreateBill_ContactNotFound(t *testing.T) {
-	origDebtus := getDebtusSpaceContactsByIDs
-	getDebtusSpaceContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]models4debtus.DebtusSpaceContactEntry, error) {
-		// Return a contact with a different ID than what the member references (c1 vs c2).
-		return []models4debtus.DebtusSpaceContactEntry{
-			models4debtus.NewDebtusSpaceContactEntry("space1", "c2", nil),
-		}, nil
-	}
-	defer func() { getDebtusSpaceContactsByIDs = origDebtus }()
-
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
+		// Return a contact with a different ID than what the member references (c1 vs c2).
 		return []dal4contactus.ContactEntry{
 			dal4contactus.NewContactEntry("space1", "c2"),
 		}, nil
@@ -388,22 +346,12 @@ func stubNamedUsers(t *testing.T) func() {
 }
 
 func TestHandleCreateBill_ContactFoundSuccess(t *testing.T) {
-	// Cover the "contact found" happy path (lines 154-166): debtusContact.ID matches member.ContactID.
-	origDebtus := getDebtusSpaceContactsByIDs
-	getDebtusSpaceContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]models4debtus.DebtusSpaceContactEntry, error) {
-		dbo := models4debtus.NewDebtusContactDbo(dto4contactus.ContactDetails{})
-		dbo.FirstName = "Alice"
-		return []models4debtus.DebtusSpaceContactEntry{
-			models4debtus.NewDebtusSpaceContactEntry("space1", "c1", dbo),
-		}, nil
-	}
-	defer func() { getDebtusSpaceContactsByIDs = origDebtus }()
-
+	// Cover the "contact found" happy path: contact.ID matches member.ContactID.
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
-		return []dal4contactus.ContactEntry{
-			dal4contactus.NewContactEntry("space1", "c1"),
-		}, nil
+		contact := dal4contactus.NewContactEntry("space1", "c1")
+		contact.Data.SetName("full", "Alice")
+		return []dal4contactus.ContactEntry{contact}, nil
 	}
 	defer func() { getContactsByIDs = origContacts }()
 

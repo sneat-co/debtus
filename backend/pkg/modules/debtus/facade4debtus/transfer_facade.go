@@ -359,12 +359,8 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 
 	if to.ContactID != "" && from.ContactID != "" {
 		if fromContact.Data.UserID != toContact.Data.UserID {
-			err = fmt.Errorf("fromCounterparty.CounterpartyUserID != toCounterparty.UserID (%s != %s)",
+			err = fmt.Errorf("fromCounterparty.UserID != toCounterparty.UserID (%s != %s)",
 				fromContact.Data.UserID, toContact.Data.UserID)
-		}
-		if toContact.Data.UserID != fromContact.Data.UserID {
-			err = fmt.Errorf("toCounterparty.CounterpartyUserID != fromCounterparty.UserID (%s != %s)",
-				toContact.Data.UserID, fromContact.Data.UserID)
 		}
 		return
 	}
