@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "site": "debtus-app",
+    "public": "frontend/dist/apps/debtus-app/browser",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

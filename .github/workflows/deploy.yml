@@ -1,0 +1,55 @@
+name: Deploy debtus-app
+
+# Builds debtus-app and deploys it to the Firebase Hosting "debtus-app" site
+# (project debtstracker-io, custom domain debtus.app).
+# Requires repo secret FIREBASE_SERVICE_ACCOUNT_DEBTSTRACKER_IO — a Firebase
+# service-account JSON with the Firebase Hosting Admin role.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/deploy.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build debtus-app
+        working-directory: frontend
+        run: pnpm exec nx build debtus-app
+
+      - name: Deploy to Firebase Hosting (live)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEBTSTRACKER_IO }}
+          projectId: debtstracker-io
+          channelId: live
