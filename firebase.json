@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "debtus-app",
+    "site": "debtusapp",
     "public": "frontend/dist/apps/debtus-app/browser",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [

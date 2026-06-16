@@ -1,8 +1,8 @@
 name: Deploy debtus-app
 
-# Builds debtus-app and deploys it to the Firebase Hosting "debtus-app" site
-# (project debtstracker-io, custom domain debtus.app).
-# Requires repo secret FIREBASE_SERVICE_ACCOUNT_DEBTSTRACKER_IO — a Firebase
+# Builds debtus-app and deploys it to the Firebase Hosting "debtusapp" site
+# (project sneat-eur3-1, custom domain debtus.app).
+# Requires repo secret FIREBASE_SERVICE_ACCOUNT_SNEAT_EUR3_1 — a Firebase
 # service-account JSON with the Firebase Hosting Admin role.
 
 on:
@@ -50,6 +50,6 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEBTSTRACKER_IO }}
-          projectId: debtstracker-io
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNEAT_EUR3_1 }}
+          projectId: sneat-eur3-1
           channelId: live
