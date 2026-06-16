@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 )
 
 var handleFunc = http.HandleFunc

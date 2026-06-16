@@ -7,7 +7,7 @@ import (
 	"github.com/crediterra/money"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dto4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func mustPanic(t *testing.T, name string, f func()) {

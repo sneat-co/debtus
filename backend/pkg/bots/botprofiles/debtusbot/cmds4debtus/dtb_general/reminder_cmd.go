@@ -7,9 +7,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/sneat-co/sneat-bots/pkg/bots/utm4bots"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/common4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/utmconsts"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/common4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/utmconsts"
 	"github.com/sneat-co/sneat-translations/trans"
 )
 

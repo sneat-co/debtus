@@ -13,7 +13,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/strongo/i18n"
 )
 

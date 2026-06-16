@@ -9,9 +9,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/facade4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/facade4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/delaying"
 	"go.uber.org/mock/gomock"
 )

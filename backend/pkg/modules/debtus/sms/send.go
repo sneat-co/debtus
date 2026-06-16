@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/common4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/common4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/gotwilio"
 	"github.com/strongo/i18n"

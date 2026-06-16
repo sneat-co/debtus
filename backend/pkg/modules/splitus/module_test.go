@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/sneat-co/sneat-go-core/extension"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/const4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 	"github.com/strongo/delaying"
 )
 

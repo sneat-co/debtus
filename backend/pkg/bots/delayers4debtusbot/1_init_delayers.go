@@ -1,8 +1,8 @@
 package delayers4debtusbot
 
 import (
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/delayed4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/delayer4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/delayed4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/delayer4debtus"
 	"github.com/strongo/delaying"
 )
 

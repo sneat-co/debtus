@@ -12,7 +12,7 @@ import (
 	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 // txErrDB wraps a dal.DB and always returns a fixed error from RunReadwriteTransaction.

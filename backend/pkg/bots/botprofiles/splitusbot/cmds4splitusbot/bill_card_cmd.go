@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/i18n"

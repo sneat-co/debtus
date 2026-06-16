@@ -3,7 +3,7 @@ package models4splitus
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 )
 
 // --- bill_owes_calculations.go:55 — remainder > 1 panic in equal split ---

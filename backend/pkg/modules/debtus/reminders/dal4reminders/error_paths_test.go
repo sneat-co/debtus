@@ -12,8 +12,8 @@ import (
 	"github.com/dal-go/dalgo/record"
 	"github.com/dal-go/dalgo/recordset"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"go.uber.org/mock/gomock"
 )
 

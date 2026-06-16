@@ -11,8 +11,8 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/general4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/general4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/gotwilio"
 	"github.com/strongo/strongoapp/person"
 )

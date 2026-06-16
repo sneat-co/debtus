@@ -1,7 +1,7 @@
 package debtusdal
 
 import (
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/delayer4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/delayer4debtus"
 	"github.com/strongo/delaying"
 )
 

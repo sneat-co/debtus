@@ -11,8 +11,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/i18n"
 	"go.uber.org/mock/gomock"
 )

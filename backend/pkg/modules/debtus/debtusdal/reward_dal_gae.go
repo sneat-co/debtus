@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func NewRewardDal() rewardDal {

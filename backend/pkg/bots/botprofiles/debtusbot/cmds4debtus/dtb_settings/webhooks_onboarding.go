@@ -8,9 +8,9 @@ import (
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_general"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_general"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/sneat-translations/trans"
 
 	"errors"

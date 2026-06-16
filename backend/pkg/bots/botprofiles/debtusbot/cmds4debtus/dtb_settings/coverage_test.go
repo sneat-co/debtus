@@ -20,9 +20,9 @@ import (
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"go.uber.org/mock/gomock"
 )
 

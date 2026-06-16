@@ -14,7 +14,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/bots"
+	bots "github.com/sneat-co/debtus/backend/pkg/bots/botscompat"
 )
 
 // nonWaitingTgChatDal returns immediately without waiting on userTask, so the

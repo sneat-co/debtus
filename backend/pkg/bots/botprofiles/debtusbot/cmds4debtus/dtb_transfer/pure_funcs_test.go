@@ -8,7 +8,7 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/i18n"

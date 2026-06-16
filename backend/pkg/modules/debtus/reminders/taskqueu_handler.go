@@ -14,11 +14,11 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/delayed4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/facade4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dal4reminders"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/delayed4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dal4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
 	"github.com/strongo/logus"
 )
 

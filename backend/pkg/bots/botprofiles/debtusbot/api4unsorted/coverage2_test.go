@@ -20,10 +20,10 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/bots"
+	bots "github.com/sneat-co/debtus/backend/pkg/bots/botscompat"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 // setupRunTxPassthrough makes runReadwriteTransaction execute its callback directly.

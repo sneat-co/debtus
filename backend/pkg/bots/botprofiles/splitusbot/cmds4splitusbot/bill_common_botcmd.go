@@ -9,8 +9,8 @@ import (
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/facade4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/facade4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/logus"
 
 	"context"

@@ -9,9 +9,9 @@ import (
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/strongo/i18n"
 )
 

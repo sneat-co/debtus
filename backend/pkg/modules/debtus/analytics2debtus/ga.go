@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/common4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/common4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 	"github.com/strongo/gamp"
 	"github.com/strongo/logus"
 )

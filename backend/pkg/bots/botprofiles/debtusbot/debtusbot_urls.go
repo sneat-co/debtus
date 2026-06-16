@@ -5,8 +5,8 @@ import (
 
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/common4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/common4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func GetNewDebtPageUrl(whc botsfw.WebhookContext, direction models4debtus.TransferDirection, utmCampaign string) string {

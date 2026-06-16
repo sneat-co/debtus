@@ -9,8 +9,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/const4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/strongo/logus"
 )
 

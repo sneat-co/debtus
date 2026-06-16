@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 func TestDurationToString(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/sneat-co/sneat-bots/pkg/bots/botinitparams"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/debtusbotconst"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/debtusbotconst"
 )
 
 var botProfile botsfw.BotProfile

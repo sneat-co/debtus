@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 func TestRewardDalGae_InsertReward(t *testing.T) {

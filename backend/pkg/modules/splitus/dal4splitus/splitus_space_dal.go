@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 func GetSplitusSpace(ctx context.Context, tx dal.ReadTransaction, splitusSpace models4splitus.SplitusSpaceEntry) (err error) {

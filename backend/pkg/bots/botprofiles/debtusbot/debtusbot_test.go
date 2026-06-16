@@ -6,7 +6,7 @@ import (
 
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/strongo/i18n"
 	"go.uber.org/mock/gomock"
 )

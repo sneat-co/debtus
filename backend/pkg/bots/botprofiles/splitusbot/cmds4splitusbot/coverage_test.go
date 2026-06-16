@@ -16,7 +16,7 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/i18n"
 	"go.uber.org/mock/gomock"
 )

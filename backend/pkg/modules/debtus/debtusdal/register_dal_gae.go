@@ -9,7 +9,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/auth/unsorted4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 )
 
 func RegisterDal() {

@@ -12,10 +12,10 @@ import (
 	"github.com/sneat-co/sneat-go-core/apicore"
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/facade4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/facade4debtus/dto4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus/dto4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 // Seams for unit testing — override in tests to avoid real DB/network I/O.

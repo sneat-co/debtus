@@ -5,8 +5,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botswebhook"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botinitparams"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/splitusbot/cmds4splitusbot"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/const4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/splitusbot/cmds4splitusbot"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 )
 
 var botProfile botsfw.BotProfile

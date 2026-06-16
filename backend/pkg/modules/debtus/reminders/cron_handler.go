@@ -7,8 +7,8 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/debtusdal"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dal4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/debtusdal"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dal4reminders"
 	"github.com/strongo/logus"
 )
 

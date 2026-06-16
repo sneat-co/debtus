@@ -4,9 +4,9 @@ import (
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/update"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/const4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 // Test seams: package-level vars wrapping hard-wired dependencies so that

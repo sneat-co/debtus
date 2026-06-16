@@ -13,7 +13,7 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 )

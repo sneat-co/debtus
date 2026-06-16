@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 )
 
 type BillsHolder struct { // TODO: Move out of auth package

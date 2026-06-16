@@ -7,9 +7,9 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/api/api4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/facade4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/api/api4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 // Seams for unit testing — override in tests to avoid real DB/network I/O.

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func SendFeedbackToAdmins(ctx context.Context, botToken string, feedback models4debtus.Feedback) (err error) {

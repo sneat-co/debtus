@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/delayer4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/delayer4debtus"
 )
 
 func TestDelayer_enqueueErrorBranches(t *testing.T) {

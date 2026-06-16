@@ -15,7 +15,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 )

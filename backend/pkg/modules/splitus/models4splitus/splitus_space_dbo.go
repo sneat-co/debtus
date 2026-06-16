@@ -9,9 +9,9 @@ import (
 	"github.com/dal-go/dalgo/update"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/const4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/const4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 	"github.com/strongo/random"
 )
 

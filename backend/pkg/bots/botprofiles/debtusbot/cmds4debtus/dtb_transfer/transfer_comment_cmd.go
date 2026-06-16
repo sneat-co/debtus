@@ -13,7 +13,7 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/facade4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/logus"
 

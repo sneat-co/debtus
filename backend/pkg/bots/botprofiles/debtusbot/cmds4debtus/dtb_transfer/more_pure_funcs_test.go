@@ -10,7 +10,7 @@ import (
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfwmodels"
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/decimal"
 	"github.com/strongo/i18n"

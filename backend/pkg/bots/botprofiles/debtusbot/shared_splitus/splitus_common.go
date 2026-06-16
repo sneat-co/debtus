@@ -6,7 +6,7 @@ import (
 
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 type SplitusSpaceAction func(whc botsfw.WebhookContext, splitusSpace models4splitus.SplitusSpaceEntry) (m botmsg.MessageFromBot, err error)

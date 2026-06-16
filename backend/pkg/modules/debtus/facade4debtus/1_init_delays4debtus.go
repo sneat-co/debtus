@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
 	"github.com/strongo/delaying"
 )
 

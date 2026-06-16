@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/mocks/mock_dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )

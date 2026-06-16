@@ -6,7 +6,7 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_transfer"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_transfer"
 	"github.com/strongo/logus"
 )
 

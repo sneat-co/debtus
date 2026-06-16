@@ -10,9 +10,9 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/update"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/strongo/decimal"
 )
 

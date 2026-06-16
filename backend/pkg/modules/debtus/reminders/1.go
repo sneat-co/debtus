@@ -1,7 +1,7 @@
 package reminders
 
 import (
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/debtusdal"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/debtusdal"
 	"github.com/strongo/delaying"
 )
 

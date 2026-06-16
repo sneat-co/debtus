@@ -3,7 +3,7 @@ package dal4debtus
 import (
 	"strconv"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 type TransferSourceBot struct {

@@ -9,9 +9,9 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	dalgorecord "github.com/dal-go/dalgo/record"
 	"github.com/sneat-co/sneat-core-modules/core/queues"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/delayer4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/delayer4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
 	"github.com/strongo/delaying"
 	"github.com/strongo/logus"
 )

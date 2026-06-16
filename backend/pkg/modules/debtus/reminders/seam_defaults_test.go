@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 // errRoundTripper fails every HTTP request immediately, so a real Telegram

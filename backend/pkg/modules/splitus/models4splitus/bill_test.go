@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 )
 
 func newValidBillCommon() BillCommon {

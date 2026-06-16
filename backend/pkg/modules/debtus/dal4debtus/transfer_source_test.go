@@ -3,7 +3,7 @@ package dal4debtus
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func TestNewTransferSourceBot_panics_on_empty_botID(t *testing.T) {

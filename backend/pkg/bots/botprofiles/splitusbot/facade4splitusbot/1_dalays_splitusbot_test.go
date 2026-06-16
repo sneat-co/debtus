@@ -3,7 +3,7 @@ package facade4splitusbot
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/facade4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/facade4splitus"
 	"github.com/strongo/delaying"
 )
 

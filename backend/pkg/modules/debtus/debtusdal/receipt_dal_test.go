@@ -3,7 +3,7 @@ package debtusdal
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func TestNewReceiptIncompleteKey(t *testing.T) {

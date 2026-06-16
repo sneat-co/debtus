@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
 )
 
 func GetDueReminderIDs(ctx context.Context, db dal.QueryExecutor) (reminderIDs []string, err error) {

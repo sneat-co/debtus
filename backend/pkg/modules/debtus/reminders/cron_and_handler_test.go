@@ -10,9 +10,9 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dbo4reminders"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 var origGetSneatDB = facade.GetSneatDB

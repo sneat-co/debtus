@@ -7,7 +7,7 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-go/pkg/bots"
+	bots "github.com/sneat-co/debtus/backend/pkg/bots/botscompat"
 	"github.com/sneat-co/sneat-translations/trans"
 )
 

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/sneat-co/sneat-core-modules/core/queues"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/reminders/dal4reminders"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/reminders/dal4reminders"
 	"github.com/strongo/delaying"
 )
 

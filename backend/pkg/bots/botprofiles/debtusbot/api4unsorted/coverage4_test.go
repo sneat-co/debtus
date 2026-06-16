@@ -17,7 +17,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/bots"
+	bots "github.com/sneat-co/debtus/backend/pkg/bots/botscompat"
 	"github.com/strongo/delaying"
 	"go.uber.org/mock/gomock"
 )

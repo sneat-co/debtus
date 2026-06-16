@@ -15,7 +15,7 @@ import (
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/core/coremodels"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/general4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/general4debtus"
 	"github.com/strongo/decimal"
 )
 

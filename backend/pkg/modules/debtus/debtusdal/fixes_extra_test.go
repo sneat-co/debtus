@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 // validTransferData returns a TransferData with the minimal valid From/To JSON

@@ -16,10 +16,10 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
-	"github.com/sneat-co/sneat-go/pkg/bots"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_transfer"
+	bots "github.com/sneat-co/debtus/backend/pkg/bots/botscompat"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_transfer"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botsettings"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 	"github.com/strongo/logus"
 	"github.com/strongo/validation"
 )

@@ -14,10 +14,10 @@ import (
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/shared_splitus"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/shared_splitus"
 	"github.com/sneat-co/sneat-bots/pkg/bots/sneatbots/facade4bots"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/briefs4splitus"
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/models4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-translations/trans"
 )
 

@@ -3,7 +3,7 @@ package facade4splitus
 import (
 	"context"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/splitus/const4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 	"github.com/strongo/delaying"
 )
 

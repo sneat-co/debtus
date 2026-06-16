@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 // TestDelayedOnReceiptSentSuccess_statusNotSent reaches the main transaction body

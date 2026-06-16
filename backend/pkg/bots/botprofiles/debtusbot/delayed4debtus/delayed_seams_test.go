@@ -12,7 +12,7 @@ import (
 	"github.com/dal-go/dalgo/mocks/mock_dal"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botsettings"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 	"go.uber.org/mock/gomock"
 )
 

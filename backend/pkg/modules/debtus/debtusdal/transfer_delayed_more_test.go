@@ -6,7 +6,7 @@ import (
 
 	"github.com/strongo/decimal"
 
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 func TestDelayedUpdateTransferWithCounterparty(t *testing.T) {

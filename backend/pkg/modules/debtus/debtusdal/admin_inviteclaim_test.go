@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/sneattesting"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 )
 
 func TestAdminDalGae_LatestUsers_returns_not_implemented(t *testing.T) {

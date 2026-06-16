@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/sneat-co/sneat-go-core/emails"
-	"github.com/sneat-co/sneat-go/internal/testutil"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/general4debtus"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/internal/testutil"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/general4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/strongo/i18n"
 	"github.com/strongo/strongoapp"
 )

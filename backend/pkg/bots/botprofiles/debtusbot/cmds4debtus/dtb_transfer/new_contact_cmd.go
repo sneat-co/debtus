@@ -21,7 +21,7 @@ import (
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-go/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_general"
+	"github.com/sneat-co/debtus/backend/pkg/bots/botprofiles/debtusbot/cmds4debtus/dtb_general"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/logus"
 	"github.com/strongo/strongoapp/appuser"

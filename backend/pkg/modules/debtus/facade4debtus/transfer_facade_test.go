@@ -3,7 +3,7 @@ package facade4debtus
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 )
 
 func Test_removeClosedTransfersFromOutstandingWithInterest(t *testing.T) {

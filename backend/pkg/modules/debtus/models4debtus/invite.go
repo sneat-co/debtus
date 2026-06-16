@@ -5,7 +5,7 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/record"
-	"github.com/sneat-co/sneat-go/pkg/modules/debtus/general4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/general4debtus"
 )
 
 type InviteBy string
