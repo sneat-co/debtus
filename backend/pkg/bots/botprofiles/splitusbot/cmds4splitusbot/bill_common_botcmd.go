@@ -1,0 +1,86 @@
+package cmds4splitusbot
+
+import (
+	"net/url"
+
+	"github.com/bots-go-framework/bots-fw/botmsg"
+	"github.com/bots-go-framework/bots-fw/botsfw"
+	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-go-core/coretypes"
+	"github.com/sneat-co/sneat-go-core/facade"
+	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/facade4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
+	"github.com/strongo/logus"
+
+	"context"
+	"errors"
+)
+
+func GetBillMembersCallbackData(billID string) string {
+	return billCallbackCommandData(billMembersCommandCode, billID)
+}
+
+func GetBillID(callbackUrl *url.URL) (billID string, err error) {
+	if billID = callbackUrl.Query().Get("bill"); billID == "" {
+		err = errors.New("required parameter 'bill' is not passed")
+	}
+	return
+}
+
+func getBill(ctx context.Context, tx dal.ReadSession, callbackUrl *url.URL) (bill models4splitus.BillEntry, err error) {
+	if bill.ID, err = GetBillID(callbackUrl); err != nil {
+		return
+	}
+	if bill, err = facade4splitus.GetBillByID(ctx, tx, bill.ID); err != nil {
+		return
+	}
+	return
+}
+
+type billCallbackActionHandler func(whc botsfw.WebhookContext, tx dal.ReadwriteTransaction, callbackUrl *url.URL, bill models4splitus.BillEntry) (m botmsg.MessageFromBot, err error)
+
+func billCallbackCommand(code botsfw.CommandCode, f billCallbackActionHandler) (command botsfw.Command) {
+	command = botsfw.NewCallbackCommand(code, billCallbackAction(f))
+	//if txOptions != nil {
+	//	command.CallbackAction = shared_all.TransactionalCallbackAction(txOptions, command.CallbackAction)
+	//}
+	return
+}
+
+// getUserGroupID is a seam so tests can inject an error from bothelper.GetUserGroupID.
+var getUserGroupID = bothelper.GetUserGroupID
+
+func billCallbackAction(f billCallbackActionHandler) func(whc botsfw.WebhookContext, callbackUrl *url.URL) (m botmsg.MessageFromBot, err error) {
+	return func(whc botsfw.WebhookContext, callbackUrl *url.URL) (m botmsg.MessageFromBot, err error) {
+		ctx := whc.Context()
+		if err = facade.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
+			var bill models4splitus.BillEntry
+			if bill, err = getBill(ctx, tx, callbackUrl); err != nil {
+				return
+			}
+			if bill.Data.GetUserGroupID() == "" {
+				var isInGroup bool
+				if isInGroup, err = whc.IsInGroup(); err != nil {
+					return
+				} else if isInGroup {
+					//var splitusSpace models4splitus.SplitusSpaceEntry
+					var userGroupID string
+					if userGroupID, err = getUserGroupID(whc); err != nil {
+						return
+					}
+					if bill, _, err = facade4splitus.AssignBillToGroup(ctx, tx, bill, coretypes.SpaceID(userGroupID), whc.AppUserID()); err != nil {
+						return
+					}
+				} else {
+					logus.Debugf(ctx, "Not in group")
+				}
+			}
+			m, err = f(whc, tx, callbackUrl, bill)
+			return err
+		}); err != nil {
+			return
+		}
+		return
+	}
+}
