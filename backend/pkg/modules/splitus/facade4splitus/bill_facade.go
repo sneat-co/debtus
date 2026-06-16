@@ -7,6 +7,7 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
@@ -14,8 +15,6 @@ import (
 	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/errors4debtus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/facade4debtus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/logus"
@@ -340,9 +339,9 @@ func CreateBill(ctx context.Context, tx dal.ReadwriteTransaction, spaceID corety
 		}
 
 		// Load counterparties so we can get respective userIDs
-		var counterparties []models4debtus.DebtusSpaceContactEntry
+		var counterparties []dal4contactus.ContactEntry
 		// Use non transactional context
-		counterparties, err = facade4debtus.GetDebtusSpaceContactsByIDs(ctx, tx, spaceID, contactIDs)
+		counterparties, err = dal4contactus.GetContactsByIDs(ctx, tx, spaceID, contactIDs)
 		if err != nil {
 			err = fmt.Errorf("failed to get counterparties by ContactID: %w", err)
 			return
@@ -353,7 +352,7 @@ func CreateBill(ctx context.Context, tx dal.ReadwriteTransaction, spaceID corety
 			for _, counterparty := range counterparties {
 				// TODO: assign not just for creator?
 				if member.UserID == "" && member.ContactByUser[billEntity.CreatorUserID].ContactID == counterparty.ID {
-					member.UserID = counterparty.Data.CounterpartyUserID
+					member.UserID = counterparty.Data.GetUserID()
 					break
 				}
 			}

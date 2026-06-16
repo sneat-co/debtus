@@ -106,7 +106,6 @@ func createContactWithinTransaction(
 				return fmt.Errorf("counterpartyContact.UserID != counterpartyUserID: %v != %v", counterparty.Contact.Data.UserID, counterpartyUserID)
 			}
 		}
-		creator.DebtusContact.Data.CounterpartyUserID = counterpartyUserID
 		creator.DebtusContact.Data.CounterpartyContactID = counterparty.Contact.ID
 		creator.DebtusContact.Data.Transfers = counterparty.DebtusContact.Data.Transfers
 		creator.DebtusContact.Data.Balanced = money.Balanced{
@@ -332,7 +331,11 @@ func DeleteContactTx(ctx context.Context, userCtx facade.UserContext, tx dal.Rea
 		}
 		return
 	}
-	if contact.Data != nil && contact.Data.CounterpartyUserID != "" {
+	stdContact, stdContactErr := dal4contactus.GetContactByID(ctx, tx, spaceID, contactID)
+	if stdContactErr != nil && !dal.IsNotFound(stdContactErr) {
+		return stdContactErr
+	}
+	if stdContactErr == nil && stdContact.Data != nil && stdContact.Data.GetUserID() != "" {
 		return ErrContactIsNotDeletable
 	}
 

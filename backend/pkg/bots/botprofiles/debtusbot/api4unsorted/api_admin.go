@@ -72,7 +72,7 @@ func HandleAdminMergeUserContacts(ctx context.Context, w http.ResponseWriter, r 
 			return errors.New("contactToKeep.UserID != contactToDelete.UserID")
 		}
 		if contactToDelete.Data.UserID != "" && contactToKeep.Data.UserID == "" {
-			return errors.New("contactToDelete.CounterpartyUserID != 0 && contactToKeep.CounterpartyUserID == 0")
+			return errors.New("contactToDelete.UserID != \"\" && contactToKeep.UserID == \"\"")
 		}
 		contactusSpace := dal4contactus.NewContactusSpaceEntry(spaceID)
 

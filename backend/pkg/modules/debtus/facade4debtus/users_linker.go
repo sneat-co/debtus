@@ -142,19 +142,12 @@ func (linker *usersLinker) getOrCreateInvitedContactByInviterUserAndInviterConta
 	}
 
 	if len(invited.contactusSpace.Data.Contacts) > 0 {
-		var invitedUserContacts []models4debtus.DebtusSpaceContactEntry
-		// Use non transaction context
-		invitedUserContacts, err = GetDebtusSpaceContactsByIDs(tctx, tx, invited.spaceID, invited.contactusSpace.Data.ContactIDs())
-		if err != nil {
-			err = fmt.Errorf("failed to call facade4debtus.GetDebtusSpaceContactsByIDs(): %w", err)
-			return
-		}
-		for _, invitedUserContact := range invitedUserContacts {
-			if invitedUserContact.Data.CounterpartyUserID == inviter.user.ID {
+		for invitedUserContactID, invitedUserContact := range invited.contactusSpace.Data.Contacts {
+			if invitedUserContact.UserID == inviter.user.ID {
 				// We re-get the entity of the found invitedContact using transactional context
 				// and store it to output var
-				if invited.debtusContact, err = GetDebtusSpaceContactByID(tctx, tx, invited.spaceID, invitedUserContact.ID); err != nil {
-					err = fmt.Errorf("failed to call GetDebtusSpaceContactByID(%s): %w", invitedUserContact.ID, err)
+				if invited.debtusContact, err = GetDebtusSpaceContactByID(tctx, tx, invited.spaceID, invitedUserContactID); err != nil {
+					err = fmt.Errorf("failed to call GetDebtusSpaceContactByID(%s): %w", invitedUserContactID, err)
 					return
 				}
 				if invited.contact.Data.Names.FirstName == "" {
@@ -241,7 +234,7 @@ func (linker *usersLinker) updateInviterContact(
 ) (
 	isJustConnected bool, err error,
 ) {
-	logus.Debugf(tctx, "usersLinker.updateInviterContact(), inviterContact.CounterpartyUserID: %s, inviterContact.CountOfTransfers: %d", inviter.debtusContact.Data.CounterpartyUserID, inviter.debtusContact.Data.CountOfTransfers)
+	logus.Debugf(tctx, "usersLinker.updateInviterContact(), inviterContact.UserID: %s, inviterContact.CountOfTransfers: %d", inviter.contact.Data.UserID, inviter.debtusContact.Data.CountOfTransfers)
 	// validate input
 	{
 		if inviter.user.ID == "" {
@@ -290,7 +283,6 @@ func (linker *usersLinker) updateInviterContact(
 		isJustConnected = true
 		inviterContactChanged = true
 		inviter.contact.Data.UserID = invited.user.ID
-		inviter.debtusContact.Data.CounterpartySpaceID = invited.spaceID
 		inviter.debtusContact.Data.CounterpartyContactID = invited.contact.ID
 		inviter.debtusContact.Data.LinkedBy = linkedBy
 		inviterContacts := inviter.contactusSpace.Data.Contacts
@@ -298,15 +290,15 @@ func (linker *usersLinker) updateInviterContact(
 			if inviterSpaceContactID == inviter.contact.ID {
 				switch inviterSpaceContact.UserID {
 				case "":
-					inviterSpaceContact.UserID = inviter.debtusContact.Data.CounterpartyUserID
+					inviterSpaceContact.UserID = invited.user.ID
 					inviterContacts[inviterSpaceContactID] = inviterSpaceContact
 					linker.changes.FlagAsChanged(inviter.contactusSpace.Record)
-				case inviter.debtusContact.Data.CounterpartyUserID:
+				case invited.user.ID:
 					// do nothing
 				default:
 					err = fmt.Errorf(
-						"data integrity issue for Contact %s: inviterSpaceContact.UserID != inviterContact.CounterpartyUserID: %s != %v",
-						inviter.contact.ID, inviterSpaceContact.UserID, inviter.debtusContact.Data.CounterpartyUserID)
+						"data integrity issue for Contact %s: inviterSpaceContact.UserID != invited.user.ID: %s != %v",
+						inviter.contact.ID, inviterSpaceContact.UserID, invited.user.ID)
 					return
 				}
 				goto inviterUserContactFound
@@ -331,9 +323,9 @@ func (linker *usersLinker) updateInviterContact(
 			logus.Debugf(tctx, "No need to update api4transfers of inviter as inviterContact.CountOfTransfers == 0")
 		}
 	case invited.user.ID:
-		logus.Infof(tctx, "inviterContact.CounterpartyUserID is already set, updateInviterContact() did nothing")
+		logus.Infof(tctx, "inviterContact.UserID is already set, updateInviterContact() did nothing")
 	default:
-		err = fmt.Errorf("inviterContact.CounterpartyUserID is different from current user. inviterContact.CounterpartyUserID: %s, currentUserID: %s", inviter.debtusContact.Data.CounterpartyUserID, invited.user.ID)
+		err = fmt.Errorf("inviterContact.UserID is different from current user. inviterContact.UserID: %s, currentUserID: %s", inviter.contact.Data.UserID, invited.user.ID)
 		return
 	}
 	return

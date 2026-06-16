@@ -18,11 +18,14 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dbo4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
@@ -253,10 +256,15 @@ func TestDeleteContact(t *testing.T) {
 
 	t.Run("contact_with_counterparty_user_is_not_deletable", func(t *testing.T) {
 		db := sneattesting.SetupMemoryDB(t)
-		contact := models4debtus.NewDebtusSpaceContactEntry(testSpaceID, "c1", &models4debtus.DebtusSpaceContactDbo{
-			WithCounterpartyFields: models4debtus.WithCounterpartyFields{CounterpartyUserID: "u2"},
+		contact := models4debtus.NewDebtusSpaceContactEntry(testSpaceID, "c1", &models4debtus.DebtusSpaceContactDbo{})
+		stdContact := dal4contactus.NewContactEntryWithData(testSpaceID, "c1", &dbo4contactus.ContactDbo{
+			ContactBase: briefs4contactus.ContactBase{
+				ContactBrief: briefs4contactus.ContactBrief{
+					WithUserID: dbmodels.WithUserID{UserID: "u2"},
+				},
+			},
 		})
-		seedRecords(t, db, contact.Record)
+		seedRecords(t, db, contact.Record, stdContact.Record)
 		if err := DeleteContact(ctx, userCtx, testSpaceID, "c1"); !errors.Is(err, ErrContactIsNotDeletable) {
 			t.Errorf("expected ErrContactIsNotDeletable, got: %v", err)
 		}
