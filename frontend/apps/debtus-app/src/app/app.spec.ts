@@ -1,12 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { getStandardSneatProviders } from '@sneat/app';
+import { debtusAppEnvironmentConfig } from '../environments/environment';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      // App extends BaseAppComponent, which injects auth/analytics/etc., so the
+      // real app provider set is required for it to be created.
+      providers: [
+        ...getStandardSneatProviders(debtusAppEnvironmentConfig),
+        provideRouter([]),
+      ],
     }),
   );
 
