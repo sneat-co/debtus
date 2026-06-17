@@ -8,7 +8,7 @@ import {
   OAuthProvider,
   signInWithRedirect,
   UserCredential,
-} from '@angular/fire/auth';
+} from 'firebase/auth';
 import { Capacitor } from '@capacitor/core';
 import { AuthProviderID, SneatAuthStateService } from '@sneat/auth-core';
 
