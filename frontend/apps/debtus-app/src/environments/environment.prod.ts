@@ -22,4 +22,9 @@ export const debtusAppEnvironmentConfig: IEnvironmentConfig = {
   production: true,
   agents: {},
   firebaseConfig,
+  // debtus.app is served at its own same-origin authDomain. signInWithPopup is
+  // unreliable here under current Chrome COOP behavior (popup closes but its
+  // result never reaches the opener), so use a full-page redirect; the shared
+  // BaseAppComponent completes it via getRedirectResult() on return.
+  signInMethod: 'redirect',
 };
