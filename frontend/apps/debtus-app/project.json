@@ -17,6 +17,7 @@
       "options": {
         "outputPath": "dist/apps/debtus-app",
         "browser": "apps/debtus-app/src/main.ts",
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/debtus-app/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
