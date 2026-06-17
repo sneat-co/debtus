@@ -8,12 +8,10 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
-	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 type DebtusSpaceDbo struct {
 	money.Balanced
-	models4splitus.BillsHolder
 
 	dbmodels.WithLastCurrencies
 	WithTransferCounts

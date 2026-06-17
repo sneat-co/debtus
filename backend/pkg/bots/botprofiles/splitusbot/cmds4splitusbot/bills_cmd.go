@@ -13,7 +13,7 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 )
@@ -39,16 +39,16 @@ func billsAction(whc botsfw.WebhookContext) (m botmsg.MessageFromBot, err error)
 		return
 	} else if !isInGroup {
 		userID := whc.AppUserID()
-		userDebtus := models4debtus.NewDebtusUserEntry(userID)
+		userSplitus := models4splitus.NewSplitusUserEntry(userID)
 
 		var db dal.DB
 		if db, err = facade.GetSneatDB(ctx); err != nil {
 			return
 		}
-		if err = db.Get(ctx, userDebtus.Record); err != nil {
+		if err = db.Get(ctx, userSplitus.Record); err != nil {
 			return
 		}
-		if len(userDebtus.Data.OutstandingBills) == 0 {
+		if len(userSplitus.Data.OutstandingBills) == 0 {
 			m.Text = whc.Translate("You have no outstanding bills.")
 			return
 		}
@@ -56,7 +56,7 @@ func billsAction(whc botsfw.WebhookContext) (m botmsg.MessageFromBot, err error)
 		buf := new(bytes.Buffer)
 		_, _ = fmt.Fprintf(buf, "<b>%v</b>\n", whc.Translate("Outstanding bills"))
 		var i int
-		for _, billJson := range userDebtus.Data.GetOutstandingBills() {
+		for _, billJson := range userSplitus.Data.GetOutstandingBills() {
 			i++
 			_, _ = fmt.Fprintf(buf, "\n%v. %v: %v %v", i, billJson.Name, billJson.Total, billJson.Currency)
 		}
