@@ -6,6 +6,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { SpacesCardComponent } from '@sneat/space-components';
+import { SpaceService } from '@sneat/space-services';
 
 // Authenticated landing page for debtus.app. Reuses the shared
 // SpacesCardComponent (the same component sneat-app uses to list a user's
@@ -21,6 +22,10 @@ import { SpacesCardComponent } from '@sneat/space-components';
     IonContent,
     SpacesCardComponent,
   ],
+  // SpaceService is @Injectable() (provided via SpaceServiceModule), not
+  // providedIn:'root'. debtus only provides it inside its space routes, so the
+  // root-level home page must provide it for SpacesCardComponent to resolve it.
+  providers: [SpaceService],
   template: `
     <ion-header>
       <ion-toolbar>
