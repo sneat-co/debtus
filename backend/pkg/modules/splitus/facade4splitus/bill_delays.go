@@ -8,7 +8,6 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
@@ -57,7 +56,7 @@ func delayedUpdateUserWithBill(ctx context.Context, billID, userID string) (err 
 		}
 	}()
 
-	if err = dal4userus.RunUserExtWorker(ctx, userID, const4debtus.ModuleID, new(models4splitus.SplitusUserDbo),
+	if err = dal4userus.RunUserExtWorker(ctx, userID, const4splitus.ModuleID, new(models4splitus.SplitusUserDbo),
 		func(ctx context.Context, tx dal.ReadwriteTransaction, params *dal4userus.UserExtWorkerParams[models4splitus.SplitusUserDbo]) (err error) {
 			if err = tx.Get(ctx, params.UserExt.Record); err != nil {
 				return err

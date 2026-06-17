@@ -6,7 +6,6 @@ import (
 	"github.com/sneat-co/sneat-core-modules/core/coremodels"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 )
 
 type DebtusUserDbo struct { // TODO: Move back into debtus module
@@ -14,7 +13,6 @@ type DebtusUserDbo struct { // TODO: Move back into debtus module
 	WithTransferCounts
 	WithHasDueTransfers
 	coremodels.SmsStats
-	models4splitus.BillsHolder
 }
 
 type DebtusUserEntry = record.DataWithID[coretypes.ExtID, *DebtusUserDbo]

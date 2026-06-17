@@ -15,7 +15,6 @@ import (
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"go.uber.org/mock/gomock"
@@ -350,8 +349,8 @@ func TestBillsAction(t *testing.T) {
 	})
 
 	t.Run("no_outstanding_bills", func(t *testing.T) {
-		userDebtus := models4debtus.NewDebtusUserEntry("u1")
-		putRecord(t, ctx, db, userDebtus.Record)
+		userSplitus := models4splitus.NewSplitusUserEntry("u1")
+		putRecord(t, ctx, db, userSplitus.Record)
 
 		whc := newMockWhc(ctrl)
 		whc.EXPECT().IsInGroup().Return(false, nil)
@@ -365,11 +364,11 @@ func TestBillsAction(t *testing.T) {
 	})
 
 	t.Run("with_outstanding_bills", func(t *testing.T) {
-		userDebtus := models4debtus.NewDebtusUserEntry("u1")
-		userDebtus.Data.OutstandingBills = map[string]briefs4splitus.BillBrief{
+		userSplitus := models4splitus.NewSplitusUserEntry("u1")
+		userSplitus.Data.OutstandingBills = map[string]briefs4splitus.BillBrief{
 			"b1": {Name: "Dinner", Total: 1500, Currency: "USD"},
 		}
-		putRecord(t, ctx, db, userDebtus.Record)
+		putRecord(t, ctx, db, userSplitus.Record)
 
 		whc := newMockWhc(ctrl)
 		whc.EXPECT().IsInGroup().Return(false, nil)

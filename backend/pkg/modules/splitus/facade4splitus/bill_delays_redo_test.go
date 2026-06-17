@@ -9,7 +9,7 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
@@ -55,7 +55,7 @@ func serveBillGet(dbo *models4splitus.BillDbo) func(ctx context.Context, rec dal
 // seedUserExt stores a SplitusUserDbo user-extension record for updUserID.
 func seedUserExt(t *testing.T, ctx context.Context, db dal.DB, outstanding map[string]briefs4splitus.BillBrief) {
 	t.Helper()
-	extKey := dal4userus.NewUserExtKey(updUserID, const4debtus.ModuleID)
+	extKey := dal4userus.NewUserExtKey(updUserID, const4splitus.ModuleID)
 	dbo := new(models4splitus.SplitusUserDbo)
 	dbo.OutstandingBills = outstanding
 	rec := dal.NewRecordWithData(extKey, dbo)
@@ -123,7 +123,7 @@ func TestDelayedUpdateUserWithBill_AddsOutstandingBill(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	extKey := dal4userus.NewUserExtKey(updUserID, const4debtus.ModuleID)
+	extKey := dal4userus.NewUserExtKey(updUserID, const4splitus.ModuleID)
 	dbo := new(models4splitus.SplitusUserDbo)
 	rec := dal.NewRecordWithData(extKey, dbo)
 	if err := memDB.Get(ctx, rec); err != nil {
@@ -157,7 +157,7 @@ func TestDelayedUpdateUserWithBill_UpdatesStaleBrief(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	extKey := dal4userus.NewUserExtKey(updUserID, const4debtus.ModuleID)
+	extKey := dal4userus.NewUserExtKey(updUserID, const4splitus.ModuleID)
 	dbo := new(models4splitus.SplitusUserDbo)
 	rec := dal.NewRecordWithData(extKey, dbo)
 	if err := memDB.Get(ctx, rec); err != nil {

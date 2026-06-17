@@ -9,8 +9,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/const4debtus"
-	"github.com/sneat-co/debtus/backend/pkg/modules/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/const4splitus"
+	"github.com/sneat-co/debtus/backend/pkg/modules/splitus/models4splitus"
 	"github.com/strongo/logus"
 )
 
@@ -27,9 +27,9 @@ func outstandingBalanceAction(whc botsfw.WebhookContext) (m botmsg.MessageFromBo
 	ctx := whc.Context()
 	logus.Debugf(ctx, "outstandingBalanceAction()")
 	userID := whc.AppUserID()
-	err = dal4userus.RunUserExtWorker[models4debtus.DebtusUserDbo](
-		ctx, userID, const4debtus.ModuleID, new(models4debtus.DebtusUserDbo),
-		func(ctx context.Context, tx dal.ReadwriteTransaction, param *dal4userus.UserExtWorkerParams[models4debtus.DebtusUserDbo]) (err error) {
+	err = dal4userus.RunUserExtWorker[models4splitus.SplitusUserDbo](
+		ctx, userID, const4splitus.ModuleID, new(models4splitus.SplitusUserDbo),
+		func(ctx context.Context, tx dal.ReadwriteTransaction, param *dal4userus.UserExtWorkerParams[models4splitus.SplitusUserDbo]) (err error) {
 			outstandingBalance := param.UserExt.Data.GetOutstandingBalance()
 			m.Text = fmt.Sprintf("Outstanding balance: %v", outstandingBalance)
 			return err
