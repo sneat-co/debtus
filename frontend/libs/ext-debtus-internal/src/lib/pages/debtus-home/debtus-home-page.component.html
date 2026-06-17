@@ -1,7 +1,10 @@
 <ion-header>
   <ion-toolbar color="light" class="with-back-button with-end-buttons">
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="$defaultBackUrl()" />
+      <!-- This is the top page of a space, so "back" should leave the space and
+           return to the app home (the spaces list), not to the space's own root
+           (which redirects straight back here). -->
+      <ion-back-button defaultHref="/" />
     </ion-buttons>
     <sneat-space-page-title
       [space]="space"

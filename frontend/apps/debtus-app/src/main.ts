@@ -15,7 +15,7 @@ import { registerIonicons } from './register-ionicons';
 bootstrapApplication(App, {
   providers: [
     ...getStandardSneatProviders(debtusAppEnvironmentConfig),
-    provideAppInfo({ appId: 'debtus', appTitle: 'debtus.app' }),
+    provideAppInfo({ appId: 'debtus', appTitle: 'Debtus.app' }),
     provideRouter([...appRoutes, ...authRoutes]),
     provideRolesByType(undefined),
   ],
