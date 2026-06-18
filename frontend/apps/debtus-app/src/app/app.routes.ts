@@ -31,10 +31,14 @@ export const appRoutes: Route[] = [
     redirectTo: 'login',
   },
   {
-    // sneat-auth-menu-item links the "signed in as" row to /my. Until debtus has
-    // a real profile page, send it to the home landing. TODO: scaffold a profile.
+    // User profile (linked auth accounts, country). Linked from the side menu's
+    // sneat-auth-menu-item "signed in as" row. Guarded like the home page.
     path: 'my',
-    pathMatch: 'full',
-    redirectTo: '',
+    loadComponent: () =>
+      import('./my/my-profile-page.component').then(
+        (m) => m.MyProfilePageComponent,
+      ),
+    canActivate: [AuthGuard],
+    data: { title: 'My profile', authGuardPipe: () => redirectToLoginIfNotSignedIn },
   },
 ];
