@@ -1,0 +1,91 @@
+{
+  "name": "splitus-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "splitus",
+  "sourceRoot": "apps/splitus-app/src",
+  "tags": [
+    "type:app",
+    "scope:splitus"
+  ],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/apps/splitus-app",
+        "browser": "apps/splitus-app/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/splitus-app/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/splitus-app/public"
+          }
+        ],
+        "styles": [
+          "apps/splitus-app/src/styles.scss"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "4mb",
+              "maximumError": "6mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "splitus-app:build:production"
+        },
+        "development": {
+          "buildTarget": "splitus-app:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "watch": false,
+        "runnerConfig": "apps/splitus-app/vitest.config.ts"
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "splitus-app:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/splitus-app/browser",
+        "spa": true
+      }
+    }
+  }
+}

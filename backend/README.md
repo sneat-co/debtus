@@ -1,9 +1,15 @@
 # Debtus backend
 
-Go module `github.com/sneat-co/debtus/backend`.
+Single Go module `github.com/sneat-co/debtus/backend` housing both the **debtus**
+and **splitus** products (they are bidirectionally coupled, so one module, not two).
 
-Scaffold only — exposes a `/health` endpoint. Debtus domain endpoints are not
-implemented here yet (the live debtus Go domain remains in sneat-go).
+Top-level packages:
+
+- `debtus/` — the debtus domain (`github.com/sneat-co/debtus/backend/debtus/...`).
+- `splitus/` — the splitus domain (`.../backend/splitus/...`).
+- `bots/` — Telegram bots: `debtusbot`, `splitusbot`, `anybot` (`.../backend/bots/...`).
+- `cmd/debtusd` — service entrypoint (`/health`).
+- `internal/` — internal helpers.
 
 ## Requirements
 - Go 1.26+

@@ -1,0 +1,105 @@
+package cmds4splitusbot
+
+import (
+	"bytes"
+	"net/url"
+
+	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
+	"github.com/bots-go-framework/bots-fw/botinput"
+	"github.com/bots-go-framework/bots-fw/botmsg"
+	"github.com/bots-go-framework/bots-fw/botsfw"
+	"github.com/crediterra/money"
+	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-core-modules/contactus/const4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
+	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
+	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
+	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-translations/emoji"
+	"github.com/sneat-co/sneat-translations/trans"
+)
+
+func SpaceSettingsAction(whc botsfw.WebhookContext, space dbo4spaceus.SpaceEntry, isEdit bool) (m botmsg.MessageFromBot, err error) {
+
+	splitusSpace := models4splitus.NewSplitusSpaceEntry(space.ID)
+	contactusSpace := dal4contactus.NewContactusSpaceEntry(space.ID)
+
+	db := whc.DB()
+	if err = db.GetMulti(whc.Context(), []dal.Record{splitusSpace.Record, contactusSpace.Record}); err != nil {
+		return
+	}
+
+	var membersCount int
+	if contactusSpace.Record.Exists() {
+		membersCount = contactusSpace.Data.GetContactsCount(const4contactus.SpaceMemberRoleMember)
+	}
+	var buf bytes.Buffer
+	buf.WriteString(whc.Translate(trans.MT_GROUP_LABEL, space.Data.Title))
+	buf.WriteString("\n")
+	buf.WriteString(whc.Translate(trans.MT_TEXT_MEMBERS_COUNT, membersCount))
+	m.Format = botmsg.FormatHTML
+	m.Text = buf.String()
+	defaultCurrency := space.Data.PrimaryCurrency
+	if defaultCurrency == "" {
+		defaultCurrency = money.CurrencyCode(whc.Translate(trans.NOT_SET))
+	}
+	m.Keyboard = tgbotapi.NewInlineKeyboardMarkup(
+		[]tgbotapi.InlineKeyboardButton{
+			{
+				Text:         whc.Translate(trans.BUTTON_TEXT_MANAGE_MEMBERS),
+				CallbackData: groupMembersCommandCode + "?space=" + string(space.ID),
+			},
+		},
+		[]tgbotapi.InlineKeyboardButton{
+			{
+				Text:         whc.Translate(trans.BT_DEFAULT_CURRENCY, defaultCurrency),
+				CallbackData: GroupSettingsChooseCurrencyCommandCode,
+			},
+		},
+		[]tgbotapi.InlineKeyboardButton{
+			{
+				Text:         whc.Translate(trans.BUTTON_TEXT_SPLIT_MODE, whc.Translate(string(splitusSpace.Data.GetSplitMode()))),
+				CallbackData: bothelper.GetSpaceCallbackCommandData(spaceSplitCommandCode, space.ID),
+			},
+		},
+		[]tgbotapi.InlineKeyboardButton{
+			tgbotapi.NewInlineKeyboardButtonSwitchInlineQueryCurrentChat(
+				emoji.CLIPBOARD_ICON+whc.Translate(trans.COMMAND_TEXT_NEW_BILL),
+				"",
+			),
+		},
+	)
+	m.IsEdit = isEdit
+	return
+}
+
+var settingsCommand = func() (settingsCommand botsfw.Command) {
+	settingsCommand = cmds4anybot.SettingsCommandTemplate
+	settingsCommand.Code = "settings_splitus"
+	settingsCommand.Action = settingsAction
+	settingsCommand.InputTypes = []botinput.Type{botinput.TypeCallbackQuery}
+	settingsCommand.CallbackAction = func(whc botsfw.WebhookContext, callbackUrl *url.URL) (m botmsg.MessageFromBot, err error) {
+		m, err = settingsAction(whc)
+		m.IsEdit = true
+		return
+	}
+	return
+}()
+
+const splitusSettingsID = "splitus"
+
+func settingsAction(whc botsfw.WebhookContext) (m botmsg.MessageFromBot, err error) {
+	var isInGroup bool
+	if isInGroup, err = whc.IsInGroup(); err != nil {
+		return
+	} else if isInGroup {
+		groupAction := bothelper.NewSpaceAction(func(whc botsfw.WebhookContext, space dbo4spaceus.SpaceEntry) (m botmsg.MessageFromBot, err error) {
+			return SpaceSettingsAction(whc, space, false)
+		})
+		return groupAction(whc)
+	} else {
+		m, _, err = cmds4anybot.SettingsMainTelegram(whc, splitusSettingsID)
+		return
+	}
+}

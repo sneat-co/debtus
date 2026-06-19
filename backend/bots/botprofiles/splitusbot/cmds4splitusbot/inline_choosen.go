@@ -1,0 +1,280 @@
+package cmds4splitusbot
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/url"
+	"regexp"
+	"strings"
+
+	"github.com/bots-go-framework/bots-fw-telegram/telegram"
+	"github.com/bots-go-framework/bots-fw/botinput"
+	"github.com/bots-go-framework/bots-fw/botmsg"
+	"github.com/bots-go-framework/bots-fw/botsfw"
+	"github.com/crediterra/money"
+	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
+	"github.com/sneat-co/sneat-go-core/coretypes"
+	"github.com/sneat-co/sneat-go-core/facade"
+	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/const4anybot"
+	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/splitus/facade4splitus"
+	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-translations/trans"
+	"github.com/strongo/decimal"
+	"github.com/strongo/logus"
+)
+
+var chosenInlineResultCommand = botsfw.Command{
+	Code:       "chosen-inline-result-command",
+	InputTypes: []botinput.Type{botinput.TypeChosenInlineResult},
+	Action: func(whc botsfw.WebhookContext) (m botmsg.MessageFromBot, err error) {
+		logus.Debugf(whc.Context(), "splitus.chosenInlineResultHandler.Action()")
+		chosenResult := whc.Input().(botinput.ChosenInlineResult)
+		resultID := chosenResult.GetResultID()
+		if strings.HasPrefix(resultID, "bill?") {
+			return createBillFromInlineChosenResult(whc, chosenResult)
+		}
+		return
+	},
+}
+
+var reDecimal = regexp.MustCompile(`\d+(\.\d+)?`)
+
+func createBillFromInlineChosenResult(whc botsfw.WebhookContext, chosenResult botinput.ChosenInlineResult) (m botmsg.MessageFromBot, err error) {
+	ctx := whc.Context()
+	logus.Debugf(ctx, "createBillFromInlineChosenResult()")
+
+	resultID := chosenResult.GetResultID()
+
+	const prefix = "bill?"
+
+	if !strings.HasPrefix(resultID, prefix) {
+		err = errors.New("Unexpected resultID: " + resultID)
+		return
+	}
+
+	switch {
+	case true:
+		userID := whc.AppUserID()
+		var values url.Values
+		if values, err = url.ParseQuery(resultID[len(prefix):]); err != nil {
+			return
+		}
+		if lang := values.Get(const4anybot.LanguageParamName); lang != "" {
+			if err = whc.SetLocale(lang); err != nil {
+				return
+			}
+		}
+		var billName string
+		if reMatches := reInlineQueryNewBill.FindStringSubmatch(chosenResult.GetQuery()); reMatches != nil {
+			billName = strings.TrimSpace(reMatches[3])
+		} else {
+			billName = whc.Translate(trans.NO_NAME)
+		}
+
+		amountStr := values.Get("amount")
+		amountIdx := reDecimal.FindStringIndex(amountStr)
+		amountNum := amountStr[:amountIdx[1]]
+		amountCcy := money.CurrencyCode(amountStr[amountIdx[1]:])
+
+		var amount decimal.Decimal64p2
+		if amount, err = decimal.ParseDecimal64p2(amountNum); err != nil {
+			return
+		}
+		bill := models4splitus.BillEntry{
+			Data: &models4splitus.BillDbo{
+				BillCommon: models4splitus.BillCommon{
+
+					TgInlineMessageIDs: []string{chosenResult.GetInlineMessageID()},
+					Name:               billName,
+					AmountTotal:        amount,
+					Status:             const4debtus.StatusDraft,
+					CreatorUserID:      userID,
+					UserIDs:            []string{userID},
+					SplitMode:          models4splitus.SplitModeEqually,
+					Currency:           amountCcy,
+				},
+			},
+		}
+
+		//var (
+		//	user          botsfw.BotAppUser
+		//	appUserEntity *models.DebutsAppUserDataOBSOLETE
+		//)
+		//if user, err = whc.GetAppUser(); err != nil {
+		//	return
+		//}
+		//appUserEntity = user.(*models.DebutsAppUserDataOBSOLETE)
+		//_, _, _, _, members := bill.AddOrGetMember(userID, 0, appUserEntity.GetFullName())
+		//if err = bill.setBillMembers(members); err != nil {
+		//	return
+		//}
+		//billMember.Paid = bill.AmountTotal
+		//switch values.Get("i") {
+		//case "paid":
+		//	billMember.Paid = bill.AmountTotal
+		//case "owe":
+		//default:
+		//	err = fmt.Errorf("unknown value of 'i' parameter: %v", query.Get("i"))
+		//	return
+		//}
+
+		defer func() {
+			if r := recover(); r != nil {
+				whc.Input().LogRequest()
+				panic(r)
+			}
+		}()
+
+		user := dbo4userus.NewUserEntry(userID)
+		spaceID := user.Data.GetFamilySpaceID()
+
+		err = facade.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
+			if bill, err = facade4splitus.CreateBill(ctx, tx, spaceID, bill.Data); err != nil {
+				return
+			}
+			return
+		})
+		if err != nil {
+			err = fmt.Errorf("failed to call facade4debtus.BillEntry.CreateBill(): %w", err)
+			return
+		}
+		logus.Infof(ctx, "createBillFromInlineChosenResult() => BillEntry created")
+
+		botCode := whc.GetBotCode()
+
+		logus.Infof(ctx, "createBillFromInlineChosenResult() => suxx 0")
+
+		footer := strings.Repeat("―", 15) + "\n" + whc.Translate(trans.MESSAGE_TEXT_ASK_BILL_PAYER)
+
+		if m.Text, err = getBillCardMessageText(ctx, botCode, whc, bill, false, footer); err != nil {
+			logus.Errorf(ctx, "Failed to create bill card")
+			return
+		} else if strings.TrimSpace(m.Text) == "" {
+			err = errors.New("getBillCardMessageText() returned empty string")
+			logus.Errorf(ctx, err.Error())
+			return
+		}
+
+		logus.Infof(ctx, "createBillFromInlineChosenResult() => suxx 1")
+
+		if m, err = whc.NewEditMessage(m.Text, botmsg.FormatHTML); err != nil { // TODO: Unnecessary hack?
+			logus.Infof(ctx, "createBillFromInlineChosenResult() => suxx 1.2")
+			logus.Errorf(ctx, err.Error())
+			return
+		}
+
+		logus.Infof(ctx, "createBillFromInlineChosenResult() => suxx 2")
+
+		m.Keyboard = getWhoPaidInlineKeyboard(whc, bill.ID)
+
+		var response botsfw.OnMessageSentResponse
+		logus.Debugf(ctx, "createBillFromInlineChosenResult() => Sending bill card: %v", m)
+
+		if response, err = whc.Responder().SendMessage(ctx, m, botsfw.BotAPISendMessageOverHTTPS); err != nil {
+			logus.Errorf(ctx, "createBillFromInlineChosenResult() => %v", err)
+			return
+		}
+
+		logus.Debugf(ctx, "response: %v", response)
+		m.Text = botmsg.NoMessageToSend
+	}
+
+	return
+}
+
+var reBillUrl = regexp.MustCompile(`\?start=bill-(\d+)$`)
+
+func getBillIDFromUrlInEditedMessage(whc botsfw.WebhookContext) (billID string) {
+	tgInput, ok := whc.Input().(telegram.TgWebhookInput)
+	if !ok {
+		return
+	}
+	tgUpdate := tgInput.TgUpdate()
+	if tgUpdate.EditedMessage == nil {
+		return
+	}
+	if tgUpdate.EditedMessage.Entities == nil {
+		return
+	}
+	for _, entity := range *tgUpdate.EditedMessage.Entities {
+		if entity.Type == "text_link" {
+			if s := reBillUrl.FindStringSubmatch(entity.URL); len(s) != 0 {
+				billID = s[1]
+				if billID == "" {
+					logus.Errorf(whc.Context(), "Missing bill ContactID")
+				}
+				return
+			}
+		}
+	}
+	return
+}
+
+var EditedBillCardHookCommand = botsfw.Command{ // TODO: seems to be not used anywhere
+	Code:       "edited-bill-card",
+	InputTypes: []botinput.Type{botinput.TypeText},
+	Action: func(whc botsfw.WebhookContext) (m botmsg.MessageFromBot, err error) {
+		whc.Input().LogRequest()
+		ctx := whc.Context()
+		billID := getBillIDFromUrlInEditedMessage(whc)
+		logus.Debugf(ctx, "editedBillCardHookCommand.Action() => billID: %s", billID)
+		if billID == "" {
+			return m, errors.New("billID is empty string")
+		}
+
+		m.Text = botmsg.NoMessageToSend
+
+		var groupID string
+		if groupID, err = bothelper.GetUserGroupID(whc); err != nil {
+			return
+		} else if groupID == "" {
+			logus.Warningf(ctx, "group.ContactID is empty string")
+			return
+		}
+
+		changed := false
+
+		err = facade.RunReadwriteTransaction(ctx, func(tctx context.Context, tx dal.ReadwriteTransaction) (err error) {
+			var bill models4splitus.BillEntry
+			if bill, err = facade4splitus.GetBillByID(ctx, tx, billID); err != nil {
+				return err
+			}
+
+			if groupID != "" && bill.Data.GetUserGroupID() != groupID { // TODO: Should we check for empty bill.GetUserGroupID() or better fail?
+				if bill, _, err = facade4splitus.AssignBillToGroup(ctx, tx, bill, coretypes.SpaceID(groupID), whc.AppUserID()); err != nil {
+					return err
+				}
+				changed = true
+			}
+
+			if changed {
+				return facade4splitus.SaveBill(ctx, tx, bill)
+			}
+
+			return err
+		})
+		if err != nil {
+			return
+		}
+		if changed {
+			logus.Debugf(ctx, "BillEntry updated with group ContactID")
+		}
+		return
+	},
+	Matcher: func(command botsfw.Command, whc botsfw.WebhookContext) (result bool) {
+		ctx := whc.Context()
+		var isInGroup bool
+		var err error
+		if isInGroup, err = whc.IsInGroup(); err != nil {
+			logus.Errorf(ctx, "whc.IsInGroup() returned error: %v", err)
+			return false
+		}
+		result = isInGroup && getBillIDFromUrlInEditedMessage(whc) != ""
+		logus.Debugf(ctx, "editedBillCardHookCommand.Matcher(): %v", result)
+		return
+	},
+}
