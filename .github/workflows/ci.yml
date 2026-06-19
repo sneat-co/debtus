@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Backend and frontend run in parallel via shared reusable workflows.
+  backend:
+    uses: sneat-co/cicd/.github/workflows/go-ci.yml@main
+    with:
+      working-directory: backend
+      # Large pre-existing codebase: surface gofmt issues without blocking for
+      # now. Flip to 'error' (the default) once `gofmt -w ./backend` has landed.
+      gofmt: warn
+
+  frontend:
+    uses: sneat-co/cicd/.github/workflows/nx-ci.yml@main
+    with:
+      working-directory: frontend
+      targets: "lint test build"
+
+  # E2E runs only after both backend and frontend succeed.
+  e2e:
+    needs: [backend, frontend]
+    uses: sneat-co/cicd/.github/workflows/playwright-e2e.yml@main
+    with:
+      working-directory: frontend
+      e2e-project-directory: frontend/apps/debtus-app-e2e
