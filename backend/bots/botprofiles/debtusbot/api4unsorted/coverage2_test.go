@@ -13,6 +13,10 @@ import (
 	"github.com/bots-go-framework/bots-fw-telegram-models/botsfwtgmodels"
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
@@ -20,10 +24,6 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
-	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 )
 
 // setupRunTxPassthrough makes runReadwriteTransaction execute its callback directly.

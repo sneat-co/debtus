@@ -6,8 +6,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/debtus/backend/debtus/common4debtus"
+	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 )
 
 const betaCommandCode = "beta"

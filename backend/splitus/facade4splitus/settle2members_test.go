@@ -8,10 +8,10 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/decimal"
 )
 

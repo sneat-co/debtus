@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/bots-go-framework/bots-api-telegram/tgbotapi"
-	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 )
 
 // buildSendReceiptInputs returns a receipt+transfer+tgChat ready for sendReceiptToTelegramChatReal.

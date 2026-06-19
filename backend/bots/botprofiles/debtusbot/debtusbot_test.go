@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
-	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/strongo/i18n"
 	"go.uber.org/mock/gomock"
 )

@@ -19,7 +19,7 @@ func NewReward(id string, data *RewardDbo) Reward {
 	}
 	return Reward{
 		RecordWithID: record.NewWithID(id, key, data),
-		Data:   data,
+		Data:         data,
 	}
 }
 
@@ -30,7 +30,7 @@ func NewRewardWithIncompleteKey(data *RewardDbo) Reward {
 	}
 	return Reward{
 		RecordWithID: record.NewWithID("", key, data),
-		Data:   data,
+		Data:         data,
 	}
 }
 

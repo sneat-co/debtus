@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-core-modules/auth/models4auth"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
+	"github.com/sneat-co/sneat-core-modules/auth/models4auth"
 )
 
 // InsertEmail uses an int64 incomplete key whose ID is auto-assigned by the

@@ -7,10 +7,10 @@ import (
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/debtus/email4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/facade4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/general4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/debtus/backend/debtus/email4debtus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/logus"
 )

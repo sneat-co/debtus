@@ -1,9 +1,9 @@
 package apimapping
 
 import (
-	"github.com/sneat-co/sneat-core-modules/auth/api4auth"
 	"github.com/sneat-co/debtus/backend/bots/botprofiles/debtusbot/api4unsorted"
 	"github.com/sneat-co/debtus/backend/debtus/reminders/api4reminders"
+	"github.com/sneat-co/sneat-core-modules/auth/api4auth"
 	"github.com/strongo/strongoapp"
 )
 

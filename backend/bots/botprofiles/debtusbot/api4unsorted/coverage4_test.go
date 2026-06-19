@@ -12,12 +12,12 @@ import (
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/mocks/mock_dal"
+	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
 	"github.com/strongo/delaying"
 	"go.uber.org/mock/gomock"
 )

@@ -8,9 +8,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/debtus/backend/splitus/facade4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/strongo/logus"
 )
 

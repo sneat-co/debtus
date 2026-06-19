@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/sneat-co/sneat-go-core/extension"
 	"github.com/sneat-co/debtus/backend/splitus/const4splitus"
+	"github.com/sneat-co/sneat-go-core/extension"
 	"github.com/strongo/delaying"
 )
 

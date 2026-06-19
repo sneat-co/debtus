@@ -3,8 +3,8 @@ package debtusdal
 import (
 	"testing"
 
-	"github.com/sneat-co/sneat-core-modules/auth/unsorted4auth"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
+	"github.com/sneat-co/sneat-core-modules/auth/unsorted4auth"
 )
 
 func TestRegisterDal(t *testing.T) {

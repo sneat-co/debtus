@@ -8,12 +8,12 @@ import (
 	"github.com/bots-go-framework/bots-fw-store/botsfwmodels"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/mocks/mock_dal"
-	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/debtus/backend/internal/testutil"
 	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/facade4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"go.uber.org/mock/gomock"
 )
 

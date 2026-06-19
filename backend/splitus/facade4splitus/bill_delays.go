@@ -7,10 +7,10 @@ import (
 	"sync"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/const4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
+	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/strongo/decimal"
 	"github.com/strongo/delaying"
 	"github.com/strongo/logus"

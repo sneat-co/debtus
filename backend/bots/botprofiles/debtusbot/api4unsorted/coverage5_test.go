@@ -11,10 +11,10 @@ import (
 
 	"github.com/bots-go-framework/bots-fw-telegram-models/botsfwtgmodels"
 	"github.com/crediterra/money"
+	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	bots "github.com/sneat-co/debtus/backend/bots/botscompat"
 )
 
 // nonWaitingTgChatDal returns immediately without waiting on userTask, so the

@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dal4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/strongo/logus"
 )
 

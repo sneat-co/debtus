@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 )
 
 func seedRecord(t *testing.T, ctx context.Context, db dal.DB, record dal.Record) {

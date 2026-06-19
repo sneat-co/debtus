@@ -13,16 +13,16 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfwconst"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/record"
-	"github.com/sneat-co/sneat-core-modules/common4all"
-	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
-	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/delayer4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/facade4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/general4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
+	"github.com/sneat-co/sneat-core-modules/common4all"
+	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/delaying"
@@ -85,7 +85,7 @@ func DelayedSendReceiptToCounterpartyByTelegram(ctx context.Context, receiptID s
 			tgChatData := new(anybot.SneatAppTgChatDbo)
 			tgChat = anybot.SneatAppTgChatEntry{
 				RecordWithID: record.NewWithID(telegramAccount.ID, tgChatKey, tgChatData),
-				Data:   tgChatData,
+				Data:         tgChatData,
 			}
 			if err = tx.Get(ctx, tgChat.Record); err != nil {
 				logus.Errorf(ctx, "failed to load user's Telegram chat entity: %v", err)

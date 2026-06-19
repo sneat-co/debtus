@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/strongo/strongoapp/person"
 )
 

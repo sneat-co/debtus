@@ -9,11 +9,11 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
-	"github.com/sneat-co/sneat-go-core/facade"
+	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
-	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
+	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-translations/trans"
 )
 
