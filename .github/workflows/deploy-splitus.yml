@@ -1,30 +1,23 @@
 name: Deploy splitus-app
 
 # Builds splitus-app and deploys it to the Firebase Hosting "splitusapp" site
-# (project sneat-eur3-1, intended custom domain splitus.app), using a dedicated
-# config file so debtus-app's deploy (firebase.json) is untouched.
+# (https://splitusapp.web.app, project sneat-eur3-1), using a dedicated config
+# file so debtus-app's deploy (firebase.json) is untouched.
 #
-# ⚠️ INFRA PREREQUISITES (one-time, not yet provisioned) before this can succeed:
-#   1. Create the Firebase Hosting site "splitusapp" in project sneat-eur3-1.
-#   2. Grant the deploy service account hosting access to that site
-#      (reusing github-debtus-deploy@sneat-eur3-1, or create github-splitus-deploy
-#      and bind it to the same WIF provider).
-#   3. Register the splitus.app custom domain + the OAuth handler if splitus.app
-#      gets its own authDomain.
-#
-# Until then, run this manually (workflow_dispatch) to validate the build/deploy
-# path. The automatic push trigger is intentionally left commented out so a
-# missing site never reddens main.
+# The splitusapp site exists and the github-debtus-deploy service account's
+# access was verified by a successful manual deploy, so auto-deploy on push is
+# enabled below. Optional follow-up: register the splitus.app custom domain (the
+# app serves on splitusapp.web.app until then).
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - 'frontend/**'
-  #     - 'firebase.splitus.json'
-  #     - '.firebaserc'
-  #     - '.github/workflows/deploy-splitus.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'firebase.splitus.json'
+      - '.firebaserc'
+      - '.github/workflows/deploy-splitus.yml'
 
 permissions:
   contents: read
