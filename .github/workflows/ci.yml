@@ -28,10 +28,17 @@ jobs:
       working-directory: frontend
       targets: "lint test build"
 
-  # E2E runs only after both backend and frontend succeed.
-  e2e:
+  # E2E (one per mini-app) runs only after both backend and frontend succeed.
+  e2e-debtus:
     needs: [backend, frontend]
     uses: sneat-co/cicd/.github/workflows/playwright-e2e.yml@main
     with:
       working-directory: frontend
       e2e-project-directory: frontend/apps/debtus-app-e2e
+
+  e2e-splitus:
+    needs: [backend, frontend]
+    uses: sneat-co/cicd/.github/workflows/playwright-e2e.yml@main
+    with:
+      working-directory: frontend
+      e2e-project-directory: frontend/apps/splitus-app-e2e

@@ -1,0 +1,23 @@
+@use 'sass:meta';
+
+/*
+ * App Global CSS — mirrors sneat-app: Ionic core styles + sneat component styles.
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@include meta.load-css('@ionic/angular/css/core.css');
+
+/* Basic CSS for apps built with Ionic */
+@include meta.load-css('@ionic/angular/css/normalize.css');
+@include meta.load-css('@ionic/angular/css/structure.css');
+@include meta.load-css('@ionic/angular/css/typography.css');
+@include meta.load-css('@ionic/angular/css/display.css');
+
+/* Optional CSS utils */
+@include meta.load-css('@ionic/angular/css/padding.css');
+@include meta.load-css('@ionic/angular/css/float-elements.css');
+@include meta.load-css('@ionic/angular/css/text-alignment.css');
+@include meta.load-css('@ionic/angular/css/text-transformation.css');
+@include meta.load-css('@ionic/angular/css/flex-utils.css');
+
+@include meta.load-css('@sneat/components/src/sneat-styles.scss');
