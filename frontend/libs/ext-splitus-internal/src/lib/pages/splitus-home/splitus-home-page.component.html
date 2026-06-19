@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="light" class="with-back-button with-end-buttons">
+    <ion-buttons slot="start">
+      <!-- This is the top page of a space, so "back" should leave the space and
+           return to the app home (the spaces list), not to the space's own root
+           (which redirects straight back here). -->
+      <ion-back-button defaultHref="/" />
+    </ion-buttons>
+    <sneat-space-page-title
+      [space]="space"
+      generalTitle="Splits"
+      icon="💸"
+      [titlesBySpaceType]="{
+        personal: 'Personal contacts',
+        family: 'Family contacts',
+      }"
+    />
+    <!--		<ion-buttons slot="end">-->
+    <!--			<ion-button-->
+    <!--				*ngIf="canAdd"-->
+    <!--				color="primary"-->
+    <!--				size="small"-->
+    <!--				(click)="goNewContact()"-->
+    <!--				[title]="'Add contact'"-->
+    <!--			>-->
+    <!--				<ion-icon name="add" />-->
+    <!--				Add-->
+    <!--			</ion-button>-->
+    <!--			<ion-menu-button />-->
+    <!--		</ion-buttons>-->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  <sneat-splitus-new-split-form [space]="space" [contact]="undefined" />
+</ion-content>

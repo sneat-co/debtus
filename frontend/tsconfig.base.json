@@ -16,7 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@sneat/ext-debtus-shared": ["libs/ext-debtus-shared/src/index.ts"],
-      "@sneat/ext-debtus-internal": ["libs/ext-debtus-internal/src/index.ts"]
+      "@sneat/ext-debtus-internal": ["libs/ext-debtus-internal/src/index.ts"],
+      "@sneat/ext-splitus-shared": ["libs/ext-splitus-shared/src/index.ts"],
+      "@sneat/ext-splitus-internal": ["libs/ext-splitus-internal/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
