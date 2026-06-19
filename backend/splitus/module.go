@@ -3,12 +3,12 @@ package splitus
 import (
 	"net/http"
 
-	"github.com/sneat-co/sneat-go-core/extension"
 	"github.com/sneat-co/debtus/backend/bots/botprofiles/splitusbot/cmds4splitusbot"
 	"github.com/sneat-co/debtus/backend/bots/botprofiles/splitusbot/facade4splitusbot"
 	"github.com/sneat-co/debtus/backend/splitus/api4splitusbot"
 	"github.com/sneat-co/debtus/backend/splitus/const4splitus"
 	"github.com/sneat-co/debtus/backend/splitus/facade4splitus"
+	"github.com/sneat-co/sneat-go-core/extension"
 	"github.com/strongo/delaying"
 	"github.com/strongo/strongoapp"
 )

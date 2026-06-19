@@ -41,7 +41,7 @@ func NewBillEntry(id string, billCommon *BillCommon) BillEntry {
 	}
 	return BillEntry{
 		RecordWithID: record.WithID[string]{ID: id},
-		Data:   data,
+		Data:         data,
 	}
 }
 

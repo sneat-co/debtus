@@ -8,13 +8,13 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/mocks/mock_dal"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/debtus/backend/debtus/reminders/dbo4reminders"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/sneat-co/sneat-core-modules/emailing"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/emails"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/debtus/backend/debtus/reminders/dbo4reminders"
-	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/strongo/strongoapp/person"
 	"go.uber.org/mock/gomock"
 )

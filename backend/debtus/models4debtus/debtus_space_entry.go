@@ -5,10 +5,10 @@ import (
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/record"
+	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/const4debtus"
 )
 
 type DebtusSpaceEntry = record.DataWithID[string, *DebtusSpaceDbo]

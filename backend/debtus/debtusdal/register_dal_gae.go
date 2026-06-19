@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/sneat-core-modules/auth/facade4auth"
 	"github.com/sneat-co/sneat-core-modules/auth/unsorted4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 )
 
 func RegisterDal() {

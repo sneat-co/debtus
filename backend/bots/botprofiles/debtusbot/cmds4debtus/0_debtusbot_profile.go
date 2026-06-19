@@ -5,10 +5,10 @@ import (
 
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/bots-go-framework/bots-fw/botswebhook"
+	"github.com/sneat-co/debtus/backend/debtus/debtusbotconst"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botinitparams"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/cmds4anybot"
-	"github.com/sneat-co/debtus/backend/debtus/debtusbotconst"
 )
 
 var botProfile botsfw.BotProfile

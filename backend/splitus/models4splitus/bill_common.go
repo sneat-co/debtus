@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/debtus/backend/splitus/briefs4splitus"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/decimal"
 	"github.com/strongo/strongoapp/with"
 )

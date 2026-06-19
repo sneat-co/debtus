@@ -14,9 +14,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
 	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/strongo/i18n"
 	"go.uber.org/mock/gomock"
 )

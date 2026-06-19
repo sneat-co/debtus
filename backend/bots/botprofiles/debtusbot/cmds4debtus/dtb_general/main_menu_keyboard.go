@@ -8,8 +8,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/bots-go-framework/bots-fw/botsfwconst"
-	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-translations/emoji"
 	"github.com/sneat-co/sneat-translations/trans"
 )

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 )
 
 func TestTransferDto_String_MarshalError(t *testing.T) {

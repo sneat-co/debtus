@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/strongo/logus"
 )
 

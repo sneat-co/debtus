@@ -10,13 +10,13 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfwconst"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/record"
-	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
-	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/debtusdal"
 	"github.com/sneat-co/debtus/backend/debtus/delayer4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
+	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/strongo/delaying"
 )
 
@@ -56,7 +56,7 @@ func newTestTgChatEntry(botID, chatID string) anybot.SneatAppTgChatEntry {
 	data := new(anybot.SneatAppTgChatDbo)
 	return anybot.SneatAppTgChatEntry{
 		RecordWithID: record.NewWithID(chatID, key, data),
-		Data:   data,
+		Data:         data,
 	}
 }
 

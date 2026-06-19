@@ -40,7 +40,7 @@ func NewInvite(id string, data *InviteData) Invite {
 	}
 	return Invite{
 		RecordWithID: record.NewWithID(id, key, data),
-		Data:   data,
+		Data:         data,
 	}
 }
 

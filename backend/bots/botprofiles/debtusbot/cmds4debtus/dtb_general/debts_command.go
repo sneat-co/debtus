@@ -9,9 +9,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
 	"github.com/sneat-co/sneat-bots/pkg/bots/sneatbots/tghelpers"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-translations/trans"
 )
 

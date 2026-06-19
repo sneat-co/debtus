@@ -9,8 +9,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
-	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-bots/pkg/bots/botprofiles/anybot/facade4anybot"
+	"github.com/sneat-co/sneat-core-modules/common4all"
 )
 
 var assignPinCode = facade4anybot.AuthFacade.AssignPinCode

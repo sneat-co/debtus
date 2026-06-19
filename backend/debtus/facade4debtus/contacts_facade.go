@@ -10,6 +10,8 @@ import (
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sanity-io/litter"
+	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/delays4contactus"
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
@@ -17,8 +19,6 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/strongo/logus"
 )
 

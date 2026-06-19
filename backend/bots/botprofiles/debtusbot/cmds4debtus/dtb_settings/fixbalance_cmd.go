@@ -8,10 +8,10 @@ import (
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 )
 
 var getUser = dal4userus.GetUser

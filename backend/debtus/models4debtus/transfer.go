@@ -11,11 +11,11 @@ import (
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/record"
+	"github.com/sneat-co/debtus/backend/debtus/general4debtus"
 	"github.com/sneat-co/sneat-core-modules/auth/models4auth"
 	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/core/coremodels"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/general4debtus"
 	"github.com/strongo/decimal"
 )
 
@@ -75,7 +75,7 @@ func NewTransfers(transferIDs []string) []TransferEntry {
 func TransferFromRecord(r dal.Record) (transfer TransferEntry) {
 	return TransferEntry{
 		RecordWithID: record.NewWithID(r.Key().ID.(string), r.Key(), r.Data),
-		Data:   r.Data().(*TransferData),
+		Data:         r.Data().(*TransferData),
 	}
 }
 
@@ -132,7 +132,7 @@ func NewTransferWithIncompleteKey(data *TransferData) TransferEntry {
 	}
 	return TransferEntry{
 		RecordWithID: record.NewWithID("", key, data),
-		Data:   data,
+		Data:         data,
 	}
 }
 

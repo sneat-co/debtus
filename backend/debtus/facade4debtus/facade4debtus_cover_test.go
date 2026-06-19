@@ -8,6 +8,9 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
+	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/sneat-co/sneat-core-modules/auth/models4auth"
 	"github.com/sneat-co/sneat-core-modules/auth/unsorted4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
@@ -18,9 +21,6 @@ import (
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
-	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
-	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
 	"github.com/strongo/decimal"
 	"github.com/strongo/strongoapp/person"
 )
