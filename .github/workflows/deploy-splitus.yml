@@ -1,0 +1,68 @@
+name: Deploy splitus-app
+
+# Builds splitus-app and deploys it to the Firebase Hosting "splitusapp" site
+# (project sneat-eur3-1, intended custom domain splitus.app), using a dedicated
+# config file so debtus-app's deploy (firebase.json) is untouched.
+#
+# ⚠️ INFRA PREREQUISITES (one-time, not yet provisioned) before this can succeed:
+#   1. Create the Firebase Hosting site "splitusapp" in project sneat-eur3-1.
+#   2. Grant the deploy service account hosting access to that site
+#      (reusing github-debtus-deploy@sneat-eur3-1, or create github-splitus-deploy
+#      and bind it to the same WIF provider).
+#   3. Register the splitus.app custom domain + the OAuth handler if splitus.app
+#      gets its own authDomain.
+#
+# Until then, run this manually (workflow_dispatch) to validate the build/deploy
+# path. The automatic push trigger is intentionally left commented out so a
+# missing site never reddens main.
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'frontend/**'
+  #     - 'firebase.splitus.json'
+  #     - '.firebaserc'
+  #     - '.github/workflows/deploy-splitus.yml'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build splitus-app
+        working-directory: frontend
+        run: pnpm exec nx build splitus-app
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/588648831063/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-debtus-deploy@sneat-eur3-1.iam.gserviceaccount.com
+
+      - name: Deploy to Firebase Hosting (live)
+        run: npx --yes firebase-tools@15 deploy --only hosting --config firebase.splitus.json --project sneat-eur3-1 --non-interactive

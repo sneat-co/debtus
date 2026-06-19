@@ -43,18 +43,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm exec nx run-many -t build --projects=ext-debtus-shared,ext-debtus-internal
+        run: pnpm exec nx run-many -t build --projects=ext-debtus-shared,ext-debtus-internal,ext-splitus-shared,ext-splitus-internal
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          pkgs="ext-debtus-shared ext-debtus-internal ext-splitus-shared ext-splitus-internal"
           if [ "$DRY_RUN" = "true" ]; then
             echo "DRY RUN — no packages will be published"
-            npm publish dist/libs/ext-debtus-shared --access public --dry-run
-            npm publish dist/libs/ext-debtus-internal --access public --dry-run
+            for p in $pkgs; do npm publish "dist/libs/$p" --access public --dry-run; done
           else
-            npm publish dist/libs/ext-debtus-shared --access public
-            npm publish dist/libs/ext-debtus-internal --access public
+            for p in $pkgs; do npm publish "dist/libs/$p" --access public; done
           fi
