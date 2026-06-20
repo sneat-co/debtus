@@ -1,0 +1,22 @@
+{
+  "name": "@sneat/extension-splitus-shared",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "@ionic/angular": "^8.0.0",
+    "rxjs": "^7.0.0",
+    "@sneat/extension-splitus-contract": "^0.0.1",
+    "@sneat/contactus-core": "0.8.0",
+    "@sneat/contactus-services": "0.8.0",
+    "@sneat/core": "0.8.0",
+    "@sneat/space-components": "^0.5.0",
+    "@sneat/space-models": "0.8.0",
+    "@sneat/space-services": "0.8.0",
+    "@sneat/ui": "^0.5.0"
+  },
+  "dependencies": { "tslib": "^2.3.0" },
+  "sideEffects": false
+}

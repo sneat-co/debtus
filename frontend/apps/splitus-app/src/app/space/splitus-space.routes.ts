@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { spacePagesRoutes } from '@sneat/ext-splitus-internal';
+import { spacePagesRoutes } from '@sneat/extension-splitus-shared';
 import {
   SpaceComponentBaseParams,
   SpaceMenuComponent,

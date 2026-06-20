@@ -1,0 +1,9 @@
+{
+  "name": "@sneat/extension-splitus-contract",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/core": "^21.0.0",
+    "rxjs": "^7.0.0"
+  },
+  "sideEffects": false
+}

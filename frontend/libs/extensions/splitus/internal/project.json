@@ -1,0 +1,39 @@
+{
+  "name": "extension-splitus-internal",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/extensions/splitus/internal/src",
+  "prefix": "sneat-splitus",
+  "projectType": "library",
+  "release": {
+    "version": {
+      "manifestRootsToUpdate": ["dist/{projectRoot}"],
+      "currentVersionResolver": "git-tag",
+      "fallbackCurrentVersionResolver": "disk"
+    }
+  },
+  "tags": ["type:internal", "scope:splitus"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/extensions/splitus/internal/ng-package.json",
+        "tsConfig": "libs/extensions/splitus/internal/tsconfig.lib.json"
+      },
+      "configurations": {
+        "production": { "tsConfig": "libs/extensions/splitus/internal/tsconfig.lib.prod.json" },
+        "development": {}
+      },
+      "defaultConfiguration": "production"
+    },
+    "nx-release-publish": { "options": { "packageRoot": "dist/{projectRoot}" } },
+    "test": {
+      "executor": "@nx/angular:unit-test",
+      "options": {
+        "watch": false,
+        "runnerConfig": "libs/extensions/splitus/internal/vitest.config.ts"
+      }
+    },
+    "lint": { "executor": "@nx/eslint:lint" }
+  }
+}
