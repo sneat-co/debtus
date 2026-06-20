@@ -6,6 +6,86 @@
 |-----|----------|----------------------|
 | Pre-run | 30.4% | 837 (of 1341) |
 | Post-run | 37.6% | 837 → see below |
+| Run 2 | 41.6% | — new tests in facade4debtus_more_test.go |
+| Run 3 (this run) | 57.3% | — deep linker/transfer/receipt tests |
+
+### Run 3 additions (CORRECTS a Run-2 error)
+
+Run 2 wrongly claimed `models4debtus.MustMatchCounterparty` is `panic("not implemented")`
+and used that to declare the deep orchestrations untestable. That was read from a STALE
+module-cache copy (`sneat-mod-debtus-go@v0.2.0`). The ACTUAL in-repo implementation
+(debtus/models4debtus/debtus_contact.go:74) only panics on a balance MISMATCH:
+`if !dbo.Balance.Equal(counterparty.Data.Balance.Reversed())`. With ZERO balances the
+check passes, so the counterparty/linker paths ARE reachable. New tests build all
+entities with zero balances and seed a consistent graph:
+
+- `linkUsersWithinTransaction` 0% → 52.9% (`users_linker_deep_test.go`) — drives the full
+  deep path: `getOrCreateInvitedContactByInviterUserAndInviterContact` (new-contact branch)
+  → `createContactWithinTransaction` (counterparty path) → `updateInvitedUser` →
+  `updateInviterContact`. Plus the empty-user-id / nil-tx guards.
+- `getOrCreateInvitedContactByInviterUserAndInviterContact` 0% → 66.7% — the "link existing
+  invited contact" branch (seeded debtus contact registered in the invited contactus space)
+  and the same-user panic guard.
+- `createContactWithinTransaction` 40.6% → 65.2% — counterparty linking branches.
+- `checkOutstandingTransfersForReturns` 0% → 97.4% (`transfer_create_deep_test.go`) — via a
+  new `fakeTransferDal`: load error, no-outstanding sentinel, exact-match, multi-transfer
+  accumulation, and under-allocation paths.
+- `CreateTransfer` 0% → 31.0% — reachable early branches: unknown ReturnToTransferID,
+  already-returned (`ErrDebtAlreadyReturned`), partial > outstanding, currency-mismatch panic.
+- `AcknowledgeReceipt` 0% → 71.2% (`receipt_ack_test.go`) — invalid op, receipt-not-found,
+  self-acknowledgement swallow, and the full already-linked acknowledge path (status/transfer
+  updated, records saved).
+- `linkUsersByReceiptWithinTransaction` 0% → 35.5% (`receipt_link_deep_test.go`) — direct
+  deep drive with a family-spaced invited user and seeded counterparty contact.
+- `LinkReceiptUsers` 0% → 17.1% (`receipt_link_entry_test.go`) — invited-user-not-found path.
+
+### Run 3 — remaining hard walls (verified empirically this run)
+
+- `updateInviterContact` switch arms `case ""` and `case invited.user.ID` are UNREACHABLE in
+  isolation: the validation guard above the switch forces
+  `inviter.contact.UserID == inviter.user.ID` while `inviter.user.ID != invited.user.ID`, so
+  the switch (keyed on `inviter.contact.UserID`) can only take the `default` (error) arm. The
+  clean "happy" completion of `linkUsersWithinTransaction` therefore cannot occur standalone
+  — the deep path legitimately terminates in this data-integrity error (asserted).
+- `createTransferWithinTransaction` (0%) — its transactional body builds user/contact records
+  via `output.From.User.ID = ...` on ZERO-VALUE entries whose `.Record` has a NIL key, then
+  calls `tx.GetMulti`, which panics in dalgo2memory on the nil key. The production code does
+  not construct proper keys here; the in-memory DB cannot run this body. Integration-only.
+- `dal4contactus.GetContactByID(ctx, nil, ...)` panics on a nil tx (no GetSneatDB fallback,
+  unlike the debtus variant), so `CreateTransfer`'s DB-recovery branch (line 162) is not
+  reachable via the in-memory harness.
+- `LinkReceiptUsers` deep path needs a pre-loaded `changes.inviter.contact.Data`; the function
+  does not populate it before the linker dereferences it. Integration-only.
+- `GetOrCreateEmailUser` new-user branch: `NewUserEntry("")` panics "userID is empty value".
+- `delayedUpdateSpaceHasDueTransfers` (0%): worker-contract panic (unchanged from Run 1).
+
+### Run 2 additions
+
+Added `facade4debtus_more_test.go` (no production changes). Newly raised:
+
+- `createContactWithinTransaction` 15.9% → 40.6% — added the **no-counterparty happy
+  path** via a new test-only `insertingContactDal` (a `dal4debtus.ContactDal` whose
+  `InsertContact` actually persists), plus the `tx == nil` and `appUser.Data == nil`
+  early-guard branches. The counterparty path remains blocked: it reaches
+  `DebtusSpaceContactDbo.MustMatchCounterparty`, which is `panic("not implemented")`.
+- `workaroundReinsertContact` 0% → 84.6% — contact-found no-op, contact-not-found flag,
+  and the acknowledged+brief-present reassignment branches, all via constructed
+  `receiptDbChanges` + in-memory DB.
+- `updateInviterContact` 0% → 41.5% — reachable branches only: the name-copy logic,
+  the `default` switch arm (data-integrity error), the `inviter.contact.UserID !=
+  inviter.user.ID` panic guard, and the empty-`inviter.user.ID` error. The `case ""`
+  (new-link) and `case invited.user.ID` switch arms are unreachable in isolation
+  because the guard above the switch forces `inviter.contact.UserID == inviter.user.ID`
+  while `inviter.user.ID != invited.user.ID`; those arms are only reachable from the
+  full `linkUsersWithinTransaction` orchestration (integration-only).
+
+### Run 2 — gaps (NOTE: the MustMatchCounterparty claim here was WRONG; see Run 3)
+
+- ~~`DebtusSpaceContactDbo.MustMatchCounterparty` is `panic("not implemented")`~~ — **INCORRECT,
+  retracted in Run 3.** The real in-repo implementation only panics on a balance mismatch; with
+  zero balances it is satisfied, and Run 3 covered the linker/counterparty paths accordingly.
+- `GetOrCreateEmailUser` new-user branch: confirmed `dbo4userus.NewUserEntry("")` panics
+  with "userID is empty value" (user_facade.go:100). Ceiling stays 26.3%. (Still valid.)
 
 (Statement totals are computed from the coverage profile: 1341 total statements,
 504 covered post-run. The previous header's "633" figure used `go tool cover -func`
