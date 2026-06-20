@@ -1,0 +1,12 @@
+{
+  "name": "@sneat/extension-debtus-internal",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/core": "^21.0.0",
+    "rxjs": "^7.0.0",
+    "@sneat/api": "0.8.0",
+    "@sneat/extension-debtus-contract": "^0.0.1"
+  },
+  "dependencies": { "tslib": "^2.3.0" },
+  "sideEffects": false
+}

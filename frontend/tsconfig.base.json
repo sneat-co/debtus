@@ -15,10 +15,24 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@sneat/ext-debtus-shared": ["libs/ext-debtus-shared/src/index.ts"],
-      "@sneat/ext-debtus-internal": ["libs/ext-debtus-internal/src/index.ts"],
-      "@sneat/ext-splitus-shared": ["libs/ext-splitus-shared/src/index.ts"],
-      "@sneat/ext-splitus-internal": ["libs/ext-splitus-internal/src/index.ts"]
+      "@sneat/extension-debtus-contract": [
+        "libs/extensions/debtus/contract/src/index.ts"
+      ],
+      "@sneat/extension-debtus-shared": [
+        "libs/extensions/debtus/shared/src/index.ts"
+      ],
+      "@sneat/extension-debtus-internal": [
+        "libs/extensions/debtus/internal/src/index.ts"
+      ],
+      "@sneat/extension-splitus-contract": [
+        "libs/extensions/splitus/contract/src/index.ts"
+      ],
+      "@sneat/extension-splitus-shared": [
+        "libs/extensions/splitus/shared/src/index.ts"
+      ],
+      "@sneat/extension-splitus-internal": [
+        "libs/extensions/splitus/internal/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

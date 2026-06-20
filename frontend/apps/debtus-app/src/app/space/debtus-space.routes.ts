@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { spacePagesRoutes } from '@sneat/ext-debtus-internal';
+import { spacePagesRoutes } from '@sneat/extension-debtus-shared';
 import {
   SpaceComponentBaseParams,
   SpaceMenuComponent,
