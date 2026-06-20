@@ -33,13 +33,17 @@ export default [
               onlyDependOnLibsWithTags: ['type:contract', 'scope:foundation'],
             },
             {
+              // NOTE: per-extension scope tags (scope:debtus/scope:splitus) are
+              // deliberately NOT allowed here — that is what makes the
+              // load-bearing `type:shared MUST NOT depend on type:internal` rule
+              // actually fire (internal carries scope:<ext>; allowing it would
+              // let shared reach internal). Shared reaches its own contract via
+              // `type:contract`.
               sourceTag: 'type:shared',
               onlyDependOnLibsWithTags: [
                 'type:contract',
                 'type:shared',
                 'scope:foundation',
-                'scope:debtus',
-                'scope:splitus',
               ],
             },
             {
