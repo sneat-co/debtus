@@ -13,8 +13,9 @@ require (
 	github.com/dal-go/dalgo v0.62.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sanity-io/litter v1.5.8
+	github.com/sneat-co/contactus/backend v0.1.0
 	github.com/sneat-co/sneat-bots v0.1.1
-	github.com/sneat-co/sneat-core-modules v0.38.58
+	github.com/sneat-co/sneat-core-modules v0.38.59
 	github.com/sneat-co/sneat-go-core v0.55.4
 	github.com/sneat-co/sneat-translations v0.7.108
 	github.com/stretchr/testify v1.11.1
@@ -42,7 +43,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/gosimple/slug v1.15.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
@@ -51,3 +51,9 @@ require (
 	golang.org/x/crypto v0.53.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/sneat-co/contactus/backend => ../../contactus/backend
+
+replace github.com/sneat-co/sneat-core-modules => ../../sneat-core-modules
+
+replace github.com/sneat-co/sneat-bots => ../../sneat-bots

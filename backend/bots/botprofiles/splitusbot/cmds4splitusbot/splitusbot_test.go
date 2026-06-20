@@ -8,7 +8,7 @@ import (
 
 	tgbotapi "github.com/bots-go-framework/bots-api-telegram/tgbotapi"
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfw"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"go.uber.org/mock/gomock"

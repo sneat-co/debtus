@@ -15,11 +15,11 @@ import (
 	"github.com/bots-go-framework/bots-fw/mocks/mock_botsfwmodels"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo/mocks/mock_dal"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/const4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactusmodels/briefs4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactusmodels/const4contactus"
 	"github.com/sneat-co/sneat-core-modules/invitus/dbo4invitus"
 	"github.com/sneat-co/sneat-core-modules/invitus/facade4invitus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
@@ -361,11 +361,9 @@ func TestStartInviteCommandAction_claimSuccess_familyAccepted(t *testing.T) {
 	invite := facade4invitus.NewInviteEntry("inv1")
 	invite.Data.Status = dbo4invitus.InviteStatusAccepted
 	// IsClaimed() returns true when Status == Accepted
-	contactusSpace := dal4contactus.NewContactusSpaceEntry("fam1")
 	resp := facade4invitus.ClaimPersonalInviteResponse{
-		Invite:         invite,
-		Space:          space,
-		ContactusSpace: contactusSpace,
+		Invite: invite,
+		Space:  space,
 	}
 	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
 		return resp, nil
@@ -373,6 +371,13 @@ func TestStartInviteCommandAction_claimSuccess_familyAccepted(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, _ dal4contactus.ContactusSpaceEntry) error {
+		return nil
+	}
+
 	whc := mock_botsfw.NewMockWebhookContext(ctrl)
 	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
 	whc.EXPECT().AppUserID().Return("user1").AnyTimes()
@@ -391,6 +396,38 @@ func TestStartInviteCommandAction_claimSuccess_familyAccepted(t *testing.T) {
 	}
 }
 
+func TestStartInviteCommandAction_claimSuccess_getContactusSpaceError(t *testing.T) {
+	origClaim := claimPersonalInvite
+	defer func() { claimPersonalInvite = origClaim }()
+
+	space := dbo4spaceus.NewSpaceEntry("fam1")
+	space.Data.Type = coretypes.SpaceTypeFamily
+	invite := facade4invitus.NewInviteEntry("inv1")
+	invite.Data.Status = dbo4invitus.InviteStatusAccepted
+	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
+		return facade4invitus.ClaimPersonalInviteResponse{Invite: invite, Space: space}, nil
+	}
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, _ dal4contactus.ContactusSpaceEntry) error {
+		return errors.New("db failure")
+	}
+
+	whc := mock_botsfw.NewMockWebhookContext(ctrl)
+	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
+	whc.EXPECT().AppUserID().Return("user1").AnyTimes()
+
+	u, _ := url.Parse("?s=family!fam1&invite=inv1&pin=1234&o=accept")
+	_, _, err := startInviteCommandAction(whc, "", u)
+	if err == nil {
+		t.Fatal("expected error from getContactusSpace")
+	}
+}
+
 func TestStartInviteCommandAction_claimSuccess_nonFamilyDeclined(t *testing.T) {
 	origClaim := claimPersonalInvite
 	defer func() { claimPersonalInvite = origClaim }()
@@ -401,25 +438,9 @@ func TestStartInviteCommandAction_claimSuccess_nonFamilyDeclined(t *testing.T) {
 	invite.Data.Status = dbo4invitus.InviteStatusDeclined
 	// IsClaimed() returns true when Status == Declined
 
-	// Add members to cover sort.Slice + member loop with all gender branches
-	cs := dal4contactus.NewContactusSpaceEntry("cmp1")
-	maleMember := &briefs4contactus.ContactBrief{Gender: dbmodels.GenderMale}
-	maleMember.Names = &person.NameFields{FullName: "Alice Male"}
-	maleMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
-	cs.Data.AddContact("m1", maleMember)
-	femaleMember := &briefs4contactus.ContactBrief{Gender: dbmodels.GenderFemale}
-	femaleMember.Names = &person.NameFields{FullName: "Bob Female"}
-	femaleMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
-	cs.Data.AddContact("f1", femaleMember)
-	unknownMember := &briefs4contactus.ContactBrief{}
-	unknownMember.Names = &person.NameFields{FullName: "Charlie Unknown"}
-	unknownMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
-	cs.Data.AddContact("u1", unknownMember)
-
 	resp := facade4invitus.ClaimPersonalInviteResponse{
-		Invite:         invite,
-		Space:          space,
-		ContactusSpace: cs,
+		Invite: invite,
+		Space:  space,
 	}
 	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
 		return resp, nil
@@ -427,6 +448,27 @@ func TestStartInviteCommandAction_claimSuccess_nonFamilyDeclined(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	// getContactusSpace populates the contactus space with members to cover
+	// sort.Slice + member loop with all gender branches.
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, cs dal4contactus.ContactusSpaceEntry) error {
+		maleMember := &briefs4contactus.ContactBrief{Gender: dbmodels.GenderMale}
+		maleMember.Names = &person.NameFields{FullName: "Alice Male"}
+		maleMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
+		cs.Data.AddContact("m1", maleMember)
+		femaleMember := &briefs4contactus.ContactBrief{Gender: dbmodels.GenderFemale}
+		femaleMember.Names = &person.NameFields{FullName: "Bob Female"}
+		femaleMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
+		cs.Data.AddContact("f1", femaleMember)
+		unknownMember := &briefs4contactus.ContactBrief{}
+		unknownMember.Names = &person.NameFields{FullName: "Charlie Unknown"}
+		unknownMember.Roles = []string{const4contactus.SpaceMemberRoleMember}
+		cs.Data.AddContact("u1", unknownMember)
+		return nil
+	}
+
 	whc := mock_botsfw.NewMockWebhookContext(ctrl)
 	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
 	whc.EXPECT().AppUserID().Return("user1").AnyTimes()
@@ -456,9 +498,8 @@ func TestStartInviteCommandAction_claimSuccess_defaultStatus_notClaimed(t *testi
 	invite.Data.From.Title = "Alice"
 	// IsClaimed() = false when Status is "pending" and Claimed is zero
 	resp := facade4invitus.ClaimPersonalInviteResponse{
-		Invite:         invite,
-		Space:          space,
-		ContactusSpace: dal4contactus.NewContactusSpaceEntry("fam1"),
+		Invite: invite,
+		Space:  space,
 	}
 	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
 		return resp, nil
@@ -466,6 +507,13 @@ func TestStartInviteCommandAction_claimSuccess_defaultStatus_notClaimed(t *testi
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, _ dal4contactus.ContactusSpaceEntry) error {
+		return nil
+	}
+
 	whc := mock_botsfw.NewMockWebhookContext(ctrl)
 	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
 	whc.EXPECT().AppUserID().Return("user1").AnyTimes()
@@ -971,9 +1019,8 @@ func TestStartInviteCommandAction_claimSuccess_familyDeclined(t *testing.T) {
 	invite := facade4invitus.NewInviteEntry("inv1")
 	invite.Data.Status = dbo4invitus.InviteStatusDeclined
 	resp := facade4invitus.ClaimPersonalInviteResponse{
-		Invite:         invite,
-		Space:          space,
-		ContactusSpace: dal4contactus.NewContactusSpaceEntry("fam1"),
+		Invite: invite,
+		Space:  space,
 	}
 	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
 		return resp, nil
@@ -981,6 +1028,13 @@ func TestStartInviteCommandAction_claimSuccess_familyDeclined(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, _ dal4contactus.ContactusSpaceEntry) error {
+		return nil
+	}
+
 	whc := mock_botsfw.NewMockWebhookContext(ctrl)
 	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
 	whc.EXPECT().AppUserID().Return("user1").AnyTimes()
@@ -1008,9 +1062,8 @@ func TestStartInviteCommandAction_claimSuccess_nonFamilyAccepted(t *testing.T) {
 	invite := facade4invitus.NewInviteEntry("inv1")
 	invite.Data.Status = dbo4invitus.InviteStatusAccepted
 	resp := facade4invitus.ClaimPersonalInviteResponse{
-		Invite:         invite,
-		Space:          space,
-		ContactusSpace: dal4contactus.NewContactusSpaceEntry("cmp1"),
+		Invite: invite,
+		Space:  space,
 	}
 	claimPersonalInvite = func(ctx facade.ContextWithUser, req facade4invitus.ClaimPersonalInviteRequest) (facade4invitus.ClaimPersonalInviteResponse, error) {
 		return resp, nil
@@ -1018,6 +1071,13 @@ func TestStartInviteCommandAction_claimSuccess_nonFamilyAccepted(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	origGetContactusSpace := getContactusSpace
+	defer func() { getContactusSpace = origGetContactusSpace }()
+	getContactusSpace = func(_ context.Context, _ dal.ReadSession, _ dal4contactus.ContactusSpaceEntry) error {
+		return nil
+	}
+
 	whc := mock_botsfw.NewMockWebhookContext(ctrl)
 	whc.EXPECT().Context().Return(context.Background()).AnyTimes()
 	whc.EXPECT().AppUserID().Return("user1").AnyTimes()

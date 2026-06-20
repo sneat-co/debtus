@@ -16,7 +16,6 @@ github.com/bots-go-framework/bots-fw-telegram-models v0.3.57 h1:CXr67DLV+iRmqYOu
 github.com/bots-go-framework/bots-fw-telegram-models v0.3.57/go.mod h1:ErFhydXF/jEExS6Yfyf2Kmbm1YwBkTzwVU/lbNrK4Hk=
 github.com/bots-go-framework/bots-go-core v0.2.4 h1:ppsw1MohTCFIDjp5tmccAokRAeq2PcuhNQooxsN4fFc=
 github.com/bots-go-framework/bots-go-core v0.2.4/go.mod h1:XCn9z4TI8sbgwyus+VDzw7iMY2QCPWEAvl23GMDjeEU=
-github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/crediterra/go-interest v0.0.0-20180510115340-54da66993b85 h1:DhDOfMUBIn76rBNxBE/cGrO69Xup+a0i9cEW1Dip5L0=
 github.com/crediterra/go-interest v0.0.0-20180510115340-54da66993b85/go.mod h1:G8FV2IlQjC168M2ZNvih9I+8pInny334pxTzcR+QhWw=
 github.com/crediterra/money v0.3.1 h1:7v3KOvGGWzBwZ/fV1QQedtbtP3KyfxNIDaqc9cdqVQg=
@@ -50,10 +49,6 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/sanity-io/litter v1.5.8 h1:uM/2lKrWdGbRXDrIq08Lh9XtVYoeGtcQxk9rtQ7+rYg=
 github.com/sanity-io/litter v1.5.8/go.mod h1:9gzJgR2i4ZpjZHsKvUXIRQVk7P+yM3e+jAF7bU2UI5U=
-github.com/sneat-co/sneat-bots v0.1.1 h1:t2tDsnV/hwb6crONSWC0p+O/K1dkdsqDDZOKH/f08wA=
-github.com/sneat-co/sneat-bots v0.1.1/go.mod h1:GV1JndT4oChqaECRJ9hzO47ChxlJWXBxeAvBZmR40+I=
-github.com/sneat-co/sneat-core-modules v0.38.58 h1:oi+kQKOGzyvUt4YotGma5wH7e2L/9uC6TKo0CmGp4+g=
-github.com/sneat-co/sneat-core-modules v0.38.58/go.mod h1:oC1SRlG5TRnDBrtacq2eRPqVdLEZ0I6Pss+2gBdisuI=
 github.com/sneat-co/sneat-go-core v0.55.4 h1:PB/Azla0p0i2nauAbSHfpEueFJ2KwLWmPyQNzfpAKdI=
 github.com/sneat-co/sneat-go-core v0.55.4/go.mod h1:qFVjM5AkIwZawuGgCkFDzD2Sh4IEVkXx2Za+N7klUdU=
 github.com/sneat-co/sneat-translations v0.7.108 h1:TlJ3K7EZEKyNxJxHkIuzS9Qkgdnb6+Uqt+j9o2tcPrk=

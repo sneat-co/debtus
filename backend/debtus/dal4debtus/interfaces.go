@@ -10,8 +10,8 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/contactus/backend/dto4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/decimal"

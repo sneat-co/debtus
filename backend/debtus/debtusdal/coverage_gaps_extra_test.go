@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/contactus/backend/dto4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/delayer4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/strongo/gotwilio"
 	"github.com/strongo/strongoapp"

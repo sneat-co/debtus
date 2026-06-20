@@ -5,6 +5,8 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
+	"github.com/sneat-co/contactus/backend/dto4contactus"
 	"github.com/sneat-co/debtus/backend/bots/botprofiles/splitusbot/facade4splitusbot"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/debtusdal"
@@ -12,8 +14,6 @@ import (
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/sneat-co/sneat-core-modules/auth/models4auth"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/facade4userus"

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sneat-co/sneat-core-modules/contactus/briefs4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/const4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactusmodels/briefs4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactusmodels/const4contactus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/i18n"
 )
