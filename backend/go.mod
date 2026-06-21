@@ -14,8 +14,8 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sanity-io/litter v1.5.8
 	github.com/sneat-co/contactus/backend v0.1.0
-	github.com/sneat-co/sneat-bots v0.1.1
-	github.com/sneat-co/sneat-core-modules v0.38.59
+	github.com/sneat-co/sneat-bots v0.1.3
+	github.com/sneat-co/sneat-core-modules v0.38.60
 	github.com/sneat-co/sneat-go-core v0.55.4
 	github.com/sneat-co/sneat-translations v0.7.108
 	github.com/stretchr/testify v1.11.1
@@ -51,9 +51,3 @@ require (
 	golang.org/x/crypto v0.53.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/sneat-co/contactus/backend => ../../contactus/backend
-
-replace github.com/sneat-co/sneat-core-modules => ../../sneat-core-modules
-
-replace github.com/sneat-co/sneat-bots => ../../sneat-bots
