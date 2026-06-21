@@ -11,9 +11,8 @@ import (
 	"github.com/bots-go-framework/bots-fw/botinput"
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-core-modules/invitus/dbo4invitus"
 	"github.com/sneat-co/sneat-core-modules/invitus/facade4invitus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dto4spaceus"
@@ -49,7 +48,7 @@ func inviteContactToJoinInlineQueryAction(whc botsfw.WebhookContext, inlineQuery
 	contact.ID = q.Get("c")
 
 	request := facade4invitus.InviteContactRequest{
-		ContactRequest: dto4contactus.ContactRequest{
+		ContactRequest: facade4invitus.ContactRequest{
 			ContactID: contact.ID,
 			SpaceRequest: dto4spaceus.SpaceRequest{
 				SpaceID: spaceRef.SpaceID(),

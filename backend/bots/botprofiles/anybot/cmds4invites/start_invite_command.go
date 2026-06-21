@@ -10,9 +10,9 @@ import (
 	"github.com/bots-go-framework/bots-fw/botmsg"
 	"github.com/bots-go-framework/bots-fw/botsfw"
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/contactus/backend/dal4contactus"
 	"github.com/sneat-co/sneat-bots/pkg/bots/bothelper"
-	"github.com/sneat-co/sneat-core-modules/contactus/const4contactus"
-	"github.com/sneat-co/sneat-core-modules/contactus/dal4contactus"
+	"github.com/sneat-co/sneat-core-modules/contactusmodels/const4contactus"
 	"github.com/sneat-co/sneat-core-modules/invitus/dbo4invitus"
 	"github.com/sneat-co/sneat-core-modules/invitus/facade4invitus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
@@ -25,6 +25,8 @@ import (
 const startInviteCommandPrefix = "invite="
 
 var claimPersonalInvite = facade4invitus.ClaimPersonalInvite
+
+var getContactusSpace = dal4contactus.GetContactusSpace
 
 func startInviteCommandAction(whc botsfw.WebhookContext, _ string, startUrl *url.URL) (handled bool, m botmsg.MessageFromBot, err error) {
 	if startUrl == nil {
@@ -55,6 +57,7 @@ func startInviteCommandAction(whc botsfw.WebhookContext, _ string, startUrl *url
 	ctx := facade.NewContextWithUserID(whc.Context(), whc.AppUserID())
 
 	var response facade4invitus.ClaimPersonalInviteResponse
+	contactusSpace := dal4contactus.NewContactusSpaceEntry(request.SpaceID)
 	if request.Operation == "view" {
 		var db dal.DB
 		if db, err = facade.GetSneatDB(ctx); err != nil {
@@ -62,11 +65,10 @@ func startInviteCommandAction(whc botsfw.WebhookContext, _ string, startUrl *url
 		}
 		response.Space = dbo4spaceus.NewSpaceEntry(request.SpaceID)
 		response.Invite = facade4invitus.NewInviteEntry(request.InviteID)
-		response.ContactusSpace = dal4contactus.NewContactusSpaceEntry(request.SpaceID)
 		if err = db.GetMulti(ctx, []dal.Record{
 			response.Invite.Record,
 			response.Space.Record,
-			response.ContactusSpace.Record,
+			contactusSpace.Record,
 		}); err != nil {
 			return
 		}
@@ -99,6 +101,9 @@ func startInviteCommandAction(whc botsfw.WebhookContext, _ string, startUrl *url
 			}
 			return
 		}
+		if err = getContactusSpace(ctx, nil, contactusSpace); err != nil {
+			return
+		}
 	}
 	handled = true
 	m.Format = botmsg.FormatHTML
@@ -121,7 +126,7 @@ func startInviteCommandAction(whc botsfw.WebhookContext, _ string, startUrl *url
 			response.Invite.Data.From.Title, response.Space.Data.Type)
 	}
 
-	members := response.ContactusSpace.Data.GetSortedContactBriefsByRoles(const4contactus.SpaceMemberRoleMember)
+	members := contactusSpace.Data.GetSortedContactBriefsByRoles(const4contactus.SpaceMemberRoleMember)
 
 	sort.Slice(members, func(i, j int) bool {
 		c1, c2 := members[i], members[j]
