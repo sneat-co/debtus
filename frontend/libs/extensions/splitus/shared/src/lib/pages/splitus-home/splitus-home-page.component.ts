@@ -6,7 +6,7 @@ import {
   IonHeader,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ContactusServicesModule } from '@sneat/contactus-services';
+import { ContactusServicesModule } from '@sneat/extension-contactus-internal';
 import { NewSplitFormComponent } from '../../components';
 import {
   SpaceComponentBaseParams,

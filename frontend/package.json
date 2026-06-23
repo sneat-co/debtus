@@ -35,6 +35,8 @@
     "@sneat/datagrid": "0.8.0",
     "@sneat/dto": "0.8.0",
     "@sneat/ext-assetus-components": "0.8.0",
+    "@sneat/extension-contactus-contract": "0.12.1",
+    "@sneat/extension-contactus-internal": "0.12.1",
     "@sneat/extensions-schedulus-main": "0.8.0",
     "@sneat/extensions-schedulus-shared": "0.8.0",
     "@sneat/grid": "0.8.0",
