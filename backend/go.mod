@@ -5,31 +5,32 @@ go 1.26.0
 require (
 	github.com/bots-go-framework/bots-api-telegram v0.14.8
 	github.com/bots-go-framework/bots-fw v0.71.56
-	github.com/bots-go-framework/bots-fw-store v0.10.3
+	github.com/bots-go-framework/bots-fw-store v0.10.5
 	github.com/bots-go-framework/bots-fw-telegram v0.25.39
 	github.com/bots-go-framework/bots-fw-telegram-models v0.3.57
 	github.com/crediterra/go-interest v0.0.0-20180510115340-54da66993b85
 	github.com/crediterra/money v0.3.1
-	github.com/dal-go/dalgo v0.62.2
+	github.com/dal-go/dalgo v0.62.7
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sanity-io/litter v1.5.8
-	github.com/sneat-co/contactus/backend v0.1.0
-	github.com/sneat-co/sneat-bots v0.1.3
-	github.com/sneat-co/sneat-core-modules v0.38.60
-	github.com/sneat-co/sneat-go-core v0.55.4
+	github.com/sneat-co/contactus-ext/backend v0.1.0
+	github.com/sneat-co/contactus/backend v0.1.2
+	github.com/sneat-co/sneat-bots v0.1.5
+	github.com/sneat-co/sneat-core-modules v0.39.0
+	github.com/sneat-co/sneat-go-core v0.55.6
 	github.com/sneat-co/sneat-translations v0.7.108
 	github.com/stretchr/testify v1.11.1
 	github.com/strongo/analytics v0.2.5
 	github.com/strongo/decimal v0.1.1
-	github.com/strongo/delaying v0.2.1
+	github.com/strongo/delaying v0.2.2
 	github.com/strongo/gamp v0.0.1
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
-	github.com/strongo/i18n v0.8.12
+	github.com/strongo/i18n v0.8.13
 	github.com/strongo/logus v0.4.1
 	github.com/strongo/random v0.0.1
 	github.com/strongo/slice v0.3.5
-	github.com/strongo/strongoapp v0.31.36
-	github.com/strongo/validation v0.0.8
+	github.com/strongo/strongoapp v0.31.39
+	github.com/strongo/validation v0.0.9
 	go.uber.org/mock v0.6.0
 	golang.org/x/net v0.55.0
 )

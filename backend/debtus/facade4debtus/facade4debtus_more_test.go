@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/sneat-co/contactus-ext/backend/contactusmodels/briefs4contactus"
 	"github.com/sneat-co/contactus/backend/dal4contactus"
 	"github.com/sneat-co/contactus/backend/dbo4contactus"
 	"github.com/sneat-co/contactus/backend/dto4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-bots/pkg/sneattesting"
-	"github.com/sneat-co/sneat-core-modules/contactusmodels/briefs4contactus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/strongo/strongoapp/person"
 )
