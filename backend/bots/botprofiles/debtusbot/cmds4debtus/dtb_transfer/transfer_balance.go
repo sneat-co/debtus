@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/crediterra/money"
+	"github.com/sneat-co/contactus-ext/backend/contactusmodels/briefs4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/common4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-core-modules/common4all"
-	"github.com/sneat-co/sneat-core-modules/contactusmodels/briefs4contactus"
 	"github.com/sneat-co/sneat-translations/trans"
 	"github.com/strongo/decimal"
 	"github.com/strongo/i18n"
