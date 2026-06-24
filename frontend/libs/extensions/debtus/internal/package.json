@@ -1,6 +1,9 @@
 {
   "name": "@sneat/extension-debtus-internal",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/core": "^21.0.0",
     "rxjs": "^7.0.0",
