@@ -94,6 +94,8 @@
   "release": {
     "projects": [
       "extension-debtus-contract",
+      "extension-debtus-internal",
+      "extension-debtus-shared",
       "extension-splitus-contract"
     ],
     "projectsRelationship": "independent",
