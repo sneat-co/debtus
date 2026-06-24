@@ -1,6 +1,9 @@
 {
   "name": "@sneat/extension-debtus-shared",
   "version": "0.0.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
