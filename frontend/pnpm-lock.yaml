@@ -71,18 +71,6 @@ importers:
       '@sneat/components':
         specifier: 0.8.0
         version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(@ionic/angular@8.8.6(0a9b76cd9bc4601e385662289c29b800))
-      '@sneat/contactus-core':
-        specifier: 0.8.0
-        version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
-      '@sneat/contactus-internal':
-        specifier: 0.8.0
-        version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
-      '@sneat/contactus-services':
-        specifier: 0.8.0
-        version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
-      '@sneat/contactus-shared':
-        specifier: 0.8.0
-        version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(@ionic/angular@8.8.6(0a9b76cd9bc4601e385662289c29b800))
       '@sneat/core':
         specifier: 0.8.0
         version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -4054,31 +4042,6 @@ packages:
 
   '@sneat/components@0.8.0':
     resolution: {integrity: sha512-vZOL/HLbK3+6ZgLA1tEB8oHtZDQFs+Z78eGMt8ignsusOvrONyOrDmzSOELCsb14JVqCcTHcVlh0Q02ljoR/tQ==}
-    peerDependencies:
-      '@angular/common': '>=21.0.0'
-      '@angular/core': '>=21.0.0'
-      '@ionic/angular': '>=8'
-
-  '@sneat/contactus-core@0.8.0':
-    resolution: {integrity: sha512-tKaeFAwU6k7YrBWJ7DI6Ov7PzUplQjN9CMZHk8lz8+u+h7rJbvxpWG6/ngJ10o4TCn9wrYdQLM6qlsSH/seCUw==}
-    peerDependencies:
-      '@angular/common': '>=21.0.0'
-      '@angular/core': '>=21.0.0'
-
-  '@sneat/contactus-internal@0.8.0':
-    resolution: {integrity: sha512-jJCzjJ3/whxWR8vX5vcCfvWB39Os/9x+RonuKY3HTRFJ4h+jPoek+YoM8bMW5sYjNztkeeEfGXnDE2p46zlCRw==}
-    peerDependencies:
-      '@angular/common': '>=21.0.0'
-      '@angular/core': '>=21.0.0'
-
-  '@sneat/contactus-services@0.8.0':
-    resolution: {integrity: sha512-r4Nrt21JvskwUBjO+X9cb3BKogrrIvvdtS7dFdtcn5B0OdNAzweTuOt5xtOL6/Ih9UdJZXxu7HfvrPH7PxwALw==}
-    peerDependencies:
-      '@angular/common': '>=21.0.0'
-      '@angular/core': '>=21.0.0'
-
-  '@sneat/contactus-shared@0.8.0':
-    resolution: {integrity: sha512-FzO6OtG5jQMXBKWIorT/4F6O6Ec0Y1+ae+WK93TQx6FKyMlaJ6CjIceGxVjUUvVt3Adv25JpkXF78w8y2CcF7g==}
     peerDependencies:
       '@angular/common': '>=21.0.0'
       '@angular/core': '>=21.0.0'
@@ -15189,31 +15152,6 @@ snapshots:
       tslib: 2.8.1
 
   '@sneat/components@0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(@ionic/angular@8.8.6(0a9b76cd9bc4601e385662289c29b800))':
-    dependencies:
-      '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
-      '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
-      '@ionic/angular': 8.8.6(0a9b76cd9bc4601e385662289c29b800)
-      tslib: 2.8.1
-
-  '@sneat/contactus-core@0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))':
-    dependencies:
-      '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
-      '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
-      tslib: 2.8.1
-
-  '@sneat/contactus-internal@0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))':
-    dependencies:
-      '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
-      '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
-      tslib: 2.8.1
-
-  '@sneat/contactus-services@0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))':
-    dependencies:
-      '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
-      '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
-      tslib: 2.8.1
-
-  '@sneat/contactus-shared@0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(@ionic/angular@8.8.6(0a9b76cd9bc4601e385662289c29b800))':
     dependencies:
       '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
