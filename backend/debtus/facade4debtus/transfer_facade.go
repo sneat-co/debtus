@@ -158,8 +158,13 @@ func (transferFacade TransfersFacade) CreateTransfer(ctx context.Context, input 
 			goto contactFound
 		}
 
-		// If Contact not found in user's JSON try to recover from DB record
-		if creatorContact, err = dal4contactus.GetContactByID(ctx, nil, input.Request.SpaceID, creatorContactID); err != nil {
+		// If Contact not found in user's JSON try to recover from DB record.
+		// NOTE: dal4contactus.GetContact() calls tx.Get() directly with no
+		// nil-tx fallback (unlike GetDebtusSpaceContact below), so passing a
+		// literal nil here panics with a nil pointer dereference on every
+		// transfer whose contact isn't already cached in creatorDebtusSpace's
+		// Contacts map. Pass the already-resolved `db` instead.
+		if creatorContact, err = dal4contactus.GetContactByID(ctx, db, input.Request.SpaceID, creatorContactID); err != nil {
 			return
 		}
 
