@@ -80,6 +80,7 @@ export class SettleUpPageComponent extends SpacePageBaseComponent {
 
   protected readonly $loading = signal(true);
   protected readonly $submitting = signal(false);
+  protected readonly $error = signal<string | undefined>(undefined);
   protected readonly $contact = signal<IContactBalance | undefined>(undefined);
   protected contactID = '';
 
@@ -105,7 +106,13 @@ export class SettleUpPageComponent extends SpacePageBaseComponent {
       .pipe(
         switchMap(([spaceID, params]) => {
           this.contactID = params.get('contactID') ?? '';
+          // Back should return to the contact detail this settle-up was
+          // opened from, not a fixed page.
+          this.$defaultBackUrlSpacePath.set(
+            `debtus-contact/${this.contactID}`,
+          );
           this.$loading.set(true);
+          this.$error.set(undefined);
           return this.debtusService.getContactBalance(
             spaceID ?? '',
             this.contactID,
@@ -129,6 +136,7 @@ export class SettleUpPageComponent extends SpacePageBaseComponent {
         },
         error: (err) => {
           this.$loading.set(false);
+          this.$error.set('Failed to load contact');
           this.errorLogger.logError(err, 'Failed to load contact for settle');
         },
       });
@@ -142,6 +150,18 @@ export class SettleUpPageComponent extends SpacePageBaseComponent {
     }
     const spaceID = this.$spaceID();
     if (!spaceID || !this.contactID) {
+      return;
+    }
+    // Mirrors the bot's "Is it returned in full?" confirmation step
+    // (askIfReturnedInFull in transfer_return.go) before recording the
+    // settling transfer — this is a financial record, not a reversible
+    // toggle, so it needs an explicit yes.
+    const title = this.$contact()?.title ?? 'this contact';
+    if (
+      !confirm(
+        `Record settlement of ${this.currency.value} ${amount.toFixed(2)} with ${title}?`,
+      )
+    ) {
       return;
     }
     const request: ISettleUpRequest = {

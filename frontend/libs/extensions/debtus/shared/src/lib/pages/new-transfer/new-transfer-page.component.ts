@@ -116,6 +116,7 @@ export class NewTransferPageComponent extends SpacePageBaseComponent {
 
   constructor() {
     super();
+    this.$defaultBackUrlSpacePath.set('debts');
     this.route.queryParamMap.pipe(first(), takeUntilDestroyed()).subscribe({
       next: (params) => {
         const dir = params.get('direction');

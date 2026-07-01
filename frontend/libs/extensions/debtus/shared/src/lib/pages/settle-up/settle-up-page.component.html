@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="light">
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="'debtus-contact/' + contactID" />
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
     </ion-buttons>
     <ion-title>Settle up</ion-title>
   </ion-toolbar>
@@ -11,6 +11,10 @@
   @if ($loading()) {
     <div class="ion-padding ion-text-center">
       <ion-spinner name="dots" />
+    </div>
+  } @else if ($error()) {
+    <div class="ion-padding">
+      <ion-note color="danger">{{ $error() }}</ion-note>
     </div>
   } @else {
     <ion-card>

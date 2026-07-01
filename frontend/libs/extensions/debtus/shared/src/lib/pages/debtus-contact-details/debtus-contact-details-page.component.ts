@@ -78,6 +78,7 @@ export class DebtusContactDetailsPageComponent extends SpacePageBaseComponent {
 
   constructor() {
     super();
+    this.$defaultBackUrlSpacePath.set('debtus-contacts');
     combineLatest([this.spaceIDChanged$, this.route.paramMap])
       .pipe(
         switchMap(([spaceID, params]) => {

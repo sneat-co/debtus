@@ -71,6 +71,7 @@ export class TransferDetailsPageComponent extends SpacePageBaseComponent {
 
   constructor() {
     super();
+    this.$defaultBackUrlSpacePath.set('debts');
     combineLatest([this.spaceIDChanged$, this.route.paramMap])
       .pipe(
         switchMap(([spaceID, params]) => {

@@ -59,6 +59,7 @@ export class DebtusContactsPageComponent extends SpacePageBaseComponent {
 
   constructor() {
     super();
+    this.$defaultBackUrlSpacePath.set('debts');
     this.spaceIDChanged$
       .pipe(
         switchMap((spaceID) => {

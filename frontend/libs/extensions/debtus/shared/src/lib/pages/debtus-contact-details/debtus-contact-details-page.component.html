@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="light">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="debtus-contacts" />
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
     </ion-buttons>
     <ion-title>{{ $contact()?.title ?? 'Contact' }}</ion-title>
   </ion-toolbar>
