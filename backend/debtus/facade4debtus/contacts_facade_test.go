@@ -247,8 +247,28 @@ func TestDeleteContact(t *testing.T) {
 	ctx := context.Background()
 	userCtx := facade.NewUserContext("u1")
 
+	// memberSpace returns a space record with "u1" (the caller in every
+	// subtest below) as a member, required since SEC-2 for DeleteContact(Tx)
+	// to enforce space membership before mutating anything.
+	memberSpace := func() dbo4spaceus.SpaceEntry {
+		space := dbo4spaceus.NewSpaceEntry(testSpaceID)
+		space.Data.UserIDs = []string{"u1"}
+		return space
+	}
+
+	t.Run("non_member_is_forbidden", func(t *testing.T) {
+		db := sneattesting.SetupMemoryDB(t)
+		space := dbo4spaceus.NewSpaceEntry(testSpaceID)
+		space.Data.UserIDs = []string{"someone-else"}
+		seedRecords(t, db, space.Record)
+		if err := DeleteContact(ctx, userCtx, testSpaceID, "c1"); !errors.Is(err, facade.ErrUnauthorized) {
+			t.Errorf("expected ErrUnauthorized for non-member caller, got: %v", err)
+		}
+	})
+
 	t.Run("missing_contact_is_no_op", func(t *testing.T) {
-		sneattesting.SetupMemoryDB(t)
+		db := sneattesting.SetupMemoryDB(t)
+		seedRecords(t, db, memberSpace().Record)
 		if err := DeleteContact(ctx, userCtx, testSpaceID, "missing"); err != nil {
 			t.Errorf("expected nil error for missing contact, got: %v", err)
 		}
@@ -264,7 +284,7 @@ func TestDeleteContact(t *testing.T) {
 				},
 			},
 		})
-		seedRecords(t, db, contact.Record, stdContact.Record)
+		seedRecords(t, db, contact.Record, stdContact.Record, memberSpace().Record)
 		if err := DeleteContact(ctx, userCtx, testSpaceID, "c1"); !errors.Is(err, ErrContactIsNotDeletable) {
 			t.Errorf("expected ErrContactIsNotDeletable, got: %v", err)
 		}
@@ -279,7 +299,7 @@ func TestDeleteContact(t *testing.T) {
 		debtusSpace.Data.Contacts = map[string]*models4debtus.DebtusContactBrief{
 			"c1": {Status: models4debtus.DebtusContactStatusActive},
 		}
-		seedRecords(t, db, contact.Record, debtusSpace.Record)
+		seedRecords(t, db, contact.Record, debtusSpace.Record, memberSpace().Record)
 
 		if err := DeleteContact(ctx, userCtx, testSpaceID, "c1"); err != nil {
 			t.Fatalf("DeleteContact() returned error: %v", err)
@@ -298,7 +318,7 @@ func TestDeleteContact(t *testing.T) {
 			Status: models4debtus.DebtusContactStatusActive,
 		})
 		debtusSpace := models4debtus.NewDebtusSpaceEntry(testSpaceID)
-		seedRecords(t, db, contact.Record, debtusSpace.Record)
+		seedRecords(t, db, contact.Record, debtusSpace.Record, memberSpace().Record)
 
 		err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 			return DeleteContactTx(ctx, userCtx, tx, testSpaceID, "c1")
@@ -321,7 +341,7 @@ func TestDeleteContact(t *testing.T) {
 		debtusSpace.Data.Contacts = map[string]*models4debtus.DebtusContactBrief{
 			"c1": {Status: models4debtus.DebtusContactStatusActive, Balance: money.Balance{"EUR": 100}},
 		}
-		seedRecords(t, db, contact.Record, debtusSpace.Record)
+		seedRecords(t, db, contact.Record, debtusSpace.Record, memberSpace().Record)
 
 		err := DeleteContact(ctx, userCtx, testSpaceID, "c1")
 		if err == nil || !strings.Contains(err.Error(), "data integrity") {
@@ -339,7 +359,7 @@ func TestDeleteContact(t *testing.T) {
 		debtusSpace.Data.Contacts = map[string]*models4debtus.DebtusContactBrief{
 			"c1": {Status: models4debtus.DebtusContactStatusActive, Balance: money.Balance{"EUR": 100}},
 		}
-		seedRecords(t, db, contact.Record, debtusSpace.Record)
+		seedRecords(t, db, contact.Record, debtusSpace.Record, memberSpace().Record)
 
 		err := DeleteContact(ctx, userCtx, testSpaceID, "c1")
 		if err == nil || !strings.Contains(err.Error(), "not implemented") {
