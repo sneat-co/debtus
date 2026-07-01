@@ -26,6 +26,18 @@ func newBillEntry(id string, data *models4splitus.BillDbo) models4splitus.BillEn
 	return record.NewDataWithID(id, key, data)
 }
 
+// stubSpaceMembership overrides the userBelongsToSpace seam so tests that
+// exercise handler logic past the SEC-6 membership check don't need a real
+// DB / space record. Restores the original seam on cleanup.
+func stubSpaceMembership(t *testing.T, isMember bool) func() {
+	t.Helper()
+	orig := userBelongsToSpace
+	userBelongsToSpace = func(_ context.Context, _ string, _ coretypes.SpaceID) (bool, error) {
+		return isMember, nil
+	}
+	return func() { userBelongsToSpace = orig }
+}
+
 // --- billToResponse ---
 
 func TestBillToResponse(t *testing.T) {
@@ -145,6 +157,8 @@ func TestHandleCreateBill_Validation(t *testing.T) {
 		},
 	}
 
+	defer stubSpaceMembership(t, true)()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			body := strings.NewReader(tt.formValues.Encode())
@@ -156,6 +170,19 @@ func TestHandleCreateBill_Validation(t *testing.T) {
 				t.Errorf("[%s] expected %d, got %d — body: %s", tt.name, tt.expectedStatus, w.Code, w.Body.String())
 			}
 		})
+	}
+}
+
+// TestHandleCreateBill_NotMember verifies SEC-6: an authenticated caller who
+// is not a member of the requested spaceID must be rejected with 403 and no
+// bill created.
+func TestHandleCreateBill_NotMember(t *testing.T) {
+	defer stubSpaceMembership(t, false)()
+
+	w := httptest.NewRecorder()
+	handleCreateBill(context.Background(), w, makeCreateBillRequest(validMembersWithUserID()), token4auth.AuthInfo{UserID: "outsider"})
+	if w.Code != http.StatusForbidden {
+		t.Errorf("expected 403, got %d — body: %s", w.Code, w.Body.String())
 	}
 }
 
@@ -180,16 +207,62 @@ func TestHandleGetBill_Success(t *testing.T) {
 	orig := getBillByID
 	getBillByID = func(_ context.Context, _ dal.ReadSession, billID string) (models4splitus.BillEntry, error) {
 		return newBillEntry(billID, &models4splitus.BillDbo{
-			BillCommon: models4splitus.BillCommon{Name: "Test", Currency: "USD"},
+			BillCommon: models4splitus.BillCommon{Name: "Test", Currency: "USD", SpaceID: "space1"},
 		}), nil
 	}
 	defer func() { getBillByID = orig }()
+	defer stubSpaceMembership(t, true)()
 
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/bill-get?id=bill1", nil)
 	w := httptest.NewRecorder()
 	handleGetBill(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
 	if w.Code != http.StatusOK {
 		t.Errorf("expected 200, got %d — body: %s", w.Code, w.Body.String())
+	}
+}
+
+// TestHandleGetBill_NotMember verifies SEC-6: an authenticated caller who is
+// not a member of the bill's space must be rejected with 403.
+func TestHandleGetBill_NotMember(t *testing.T) {
+	orig := getBillByID
+	getBillByID = func(_ context.Context, _ dal.ReadSession, billID string) (models4splitus.BillEntry, error) {
+		return newBillEntry(billID, &models4splitus.BillDbo{
+			BillCommon: models4splitus.BillCommon{Name: "Test", Currency: "USD", SpaceID: "space1"},
+		}), nil
+	}
+	defer func() { getBillByID = orig }()
+	defer stubSpaceMembership(t, false)()
+
+	r := httptest.NewRequest(http.MethodGet, "/api4debtus/bill-get?id=bill1", nil)
+	w := httptest.NewRecorder()
+	handleGetBill(context.Background(), w, r, token4auth.AuthInfo{UserID: "outsider"})
+	if w.Code != http.StatusForbidden {
+		t.Errorf("expected 403, got %d — body: %s", w.Code, w.Body.String())
+	}
+}
+
+// TestHandleGetBill_MembershipCheckError verifies a membership-check DB error
+// is surfaced as 500 rather than silently allowing the request through.
+func TestHandleGetBill_MembershipCheckError(t *testing.T) {
+	origBill := getBillByID
+	getBillByID = func(_ context.Context, _ dal.ReadSession, billID string) (models4splitus.BillEntry, error) {
+		return newBillEntry(billID, &models4splitus.BillDbo{
+			BillCommon: models4splitus.BillCommon{Name: "Test", Currency: "USD", SpaceID: "space1"},
+		}), nil
+	}
+	defer func() { getBillByID = origBill }()
+
+	origMembership := userBelongsToSpace
+	userBelongsToSpace = func(_ context.Context, _ string, _ coretypes.SpaceID) (bool, error) {
+		return false, errors.New("space db error")
+	}
+	defer func() { userBelongsToSpace = origMembership }()
+
+	r := httptest.NewRequest(http.MethodGet, "/api4debtus/bill-get?id=bill1", nil)
+	w := httptest.NewRecorder()
+	handleGetBill(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("expected 500, got %d — body: %s", w.Code, w.Body.String())
 	}
 }
 
@@ -213,6 +286,8 @@ func validMembersWithUserID() url.Values {
 }
 
 func TestHandleCreateBill_GetUsersByIDsError(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	origUsers := getUsersByIDs
 	getUsersByIDs = func(_ context.Context, _ []string) ([]dbo4userus.UserEntry, error) {
 		return nil, errors.New("users db error")
@@ -227,6 +302,8 @@ func TestHandleCreateBill_GetUsersByIDsError(t *testing.T) {
 }
 
 func TestHandleCreateBill_MemberHasBothIDs(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	origUsers := getUsersByIDs
 	getUsersByIDs = func(_ context.Context, _ []string) ([]dbo4userus.UserEntry, error) {
 		return nil, nil
@@ -254,6 +331,8 @@ func TestHandleCreateBill_MemberHasBothIDs(t *testing.T) {
 }
 
 func TestHandleCreateBill_GetContactsByIDsError(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
 		return nil, errors.New("contacts db error")
@@ -274,6 +353,8 @@ func TestHandleCreateBill_GetContactsByIDsError(t *testing.T) {
 }
 
 func TestHandleCreateBill_ContactNotFound(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
 		// Return a contact with a different ID than what the member references (c1 vs c2).
@@ -297,6 +378,8 @@ func TestHandleCreateBill_ContactNotFound(t *testing.T) {
 }
 
 func TestHandleCreateBill_TotalMismatch(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	origUsers := getUsersByIDs
 	getUsersByIDs = func(_ context.Context, _ []string) ([]dbo4userus.UserEntry, error) {
 		return []dbo4userus.UserEntry{}, nil
@@ -346,6 +429,8 @@ func stubNamedUsers(t *testing.T) func() {
 }
 
 func TestHandleCreateBill_ContactFoundSuccess(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	// Cover the "contact found" happy path: contact.ID matches member.ContactID.
 	origContacts := getContactsByIDs
 	getContactsByIDs = func(_ context.Context, _ dal.ReadSession, _ coretypes.SpaceID, _ []string) ([]dal4contactus.ContactEntry, error) {
@@ -384,6 +469,8 @@ func TestHandleCreateBill_ContactFoundSuccess(t *testing.T) {
 }
 
 func TestHandleCreateBill_SetBillMembersError(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+
 	// member has no name (userID not in users list) → SetBillMembers returns error
 	origUsers := getUsersByIDs
 	getUsersByIDs = func(_ context.Context, _ []string) ([]dbo4userus.UserEntry, error) {
@@ -399,6 +486,7 @@ func TestHandleCreateBill_SetBillMembersError(t *testing.T) {
 }
 
 func TestHandleCreateBill_CreateBillError(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
 	defer stubNamedUsers(t)()
 
 	origCreate := createBill
@@ -421,6 +509,7 @@ func TestHandleCreateBill_CreateBillError(t *testing.T) {
 }
 
 func TestHandleCreateBill_Success(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
 	defer stubNamedUsers(t)()
 
 	origCreate := createBill

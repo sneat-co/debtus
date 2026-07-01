@@ -16,6 +16,7 @@ import (
 	"github.com/sneat-co/debtus/backend/splitus/models4splitus"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
+	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
@@ -30,6 +31,24 @@ var getUsersByIDs = dal4userus.GetUsersByIDs
 var createBill = facade4splitus.CreateBill
 var runReadwriteTransaction = facade.RunReadwriteTransaction
 
+// userBelongsToSpace checks - via the platform-level space record's UserIDs -
+// that userID is a member of spaceID.
+// Fable refactoring (SEC-6): bill endpoints previously trusted the
+// caller-supplied spaceID/billID without verifying the authenticated user
+// actually belongs to that space, allowing any authenticated user to read or
+// create bills in any space by ID/spaceID guessing.
+var userBelongsToSpace = func(ctx context.Context, userID string, spaceID coretypes.SpaceID) (bool, error) {
+	db, err := facade.GetSneatDB(ctx)
+	if err != nil {
+		return false, err
+	}
+	space := dbo4spaceus.NewSpaceEntry(spaceID)
+	if err = db.Get(ctx, space.Record); err != nil {
+		return false, err
+	}
+	return space.Data.HasUser(userID), nil
+}
+
 func handleGetBill(ctx context.Context, w http.ResponseWriter, r *http.Request, authInfo token4auth.AuthInfo) {
 	billID := r.URL.Query().Get("id")
 	if billID == "" {
@@ -39,6 +58,13 @@ func handleGetBill(ctx context.Context, w http.ResponseWriter, r *http.Request, 
 	bill, err := getBillByID(ctx, nil, billID)
 	if err != nil {
 		common4all.InternalError(ctx, w, err)
+		return
+	}
+	if isMember, err := userBelongsToSpace(ctx, authInfo.UserID, bill.Data.SpaceID); err != nil {
+		common4all.InternalError(ctx, w, err)
+		return
+	} else if !authInfo.IsAdmin && !isMember {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	billToResponse(ctx, w, authInfo.UserID, bill)
@@ -53,6 +79,13 @@ func handleCreateBill(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	spaceID := coretypes.SpaceID(r.PostFormValue("spaceID"))
 	if spaceID == "" {
 		common4all.BadRequestMessage(ctx, w, "Missing required parameter: spaceID")
+		return
+	}
+	if isMember, err := userBelongsToSpace(ctx, authInfo.UserID, spaceID); err != nil {
+		common4all.InternalError(ctx, w, err)
+		return
+	} else if !authInfo.IsAdmin && !isMember {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	amountStr := r.PostFormValue("amount")
