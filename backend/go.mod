@@ -10,14 +10,14 @@ require (
 	github.com/bots-go-framework/bots-fw-telegram-models v0.3.57
 	github.com/crediterra/go-interest v0.0.0-20180510115340-54da66993b85
 	github.com/crediterra/money v0.3.1
-	github.com/dal-go/dalgo v0.62.7
+	github.com/dal-go/dalgo v0.62.8
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/sanity-io/litter v1.5.8
 	github.com/sneat-co/contactus-ext/backend v0.1.0
 	github.com/sneat-co/contactus/backend v0.1.2
 	github.com/sneat-co/sneat-bots v0.1.5
-	github.com/sneat-co/sneat-core-modules v0.39.0
-	github.com/sneat-co/sneat-go-core v0.55.6
+	github.com/sneat-co/sneat-core-modules v0.42.5
+	github.com/sneat-co/sneat-go-core v0.58.2
 	github.com/sneat-co/sneat-translations v0.7.108
 	github.com/stretchr/testify v1.11.1
 	github.com/strongo/analytics v0.2.5
@@ -29,7 +29,7 @@ require (
 	github.com/strongo/logus v0.4.1
 	github.com/strongo/random v0.0.1
 	github.com/strongo/slice v0.3.5
-	github.com/strongo/strongoapp v0.31.39
+	github.com/strongo/strongoapp v0.31.40
 	github.com/strongo/validation v0.0.9
 	go.uber.org/mock v0.6.0
 	golang.org/x/net v0.55.0
