@@ -3,11 +3,13 @@ package api4transfers
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/debtus/backend/debtus/api/api4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/facade4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
 	"github.com/sneat-co/sneat-core-modules/common4all"
 	"github.com/sneat-co/sneat-go-core/facade"
 )
@@ -18,12 +20,21 @@ var (
 	checkTransferCreatorNameFn4transfers = facade4debtus.CheckTransferCreatorNameAndFixIfNeeded
 )
 
-func HandleGetTransfer(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+// HandleGetTransfer requires an authenticated caller and only returns the
+// transfer if that caller is one of its two parties (or an admin).
+// Fable refactoring (SEC-1): route was previously registered without any
+// auth wrapper, allowing anyone to read any transfer by ID (IDOR).
+func HandleGetTransfer(ctx context.Context, w http.ResponseWriter, r *http.Request, authInfo token4auth.AuthInfo) {
 	if transferID := common4all.GetStrID(ctx, w, r, "id"); transferID == "" {
 		return
 	} else {
 		transfer, err := getTransferByIDFn4transfers(ctx, nil, transferID)
 		if common4all.HasError(ctx, w, err, models4debtus.TransfersCollection, transferID, http.StatusBadRequest) {
+			return
+		}
+
+		if !authInfo.IsAdmin && !slices.Contains([]string{transfer.Data.From().UserID, transfer.Data.To().UserID}, authInfo.UserID) {
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 
