@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
+    </ion-buttons>
+    <ion-title>Settle up</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  @if ($loading()) {
+    <div class="ion-padding ion-text-center">
+      <ion-spinner name="dots" />
+    </div>
+  } @else if ($error()) {
+    <div class="ion-padding">
+      <ion-note color="danger">{{ $error() }}</ion-note>
+    </div>
+  } @else {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ $contact()?.title ?? 'Contact' }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Current balance: {{ formatSignedBalance($contact()?.balance ?? {}) }}
+      </ion-card-content>
+    </ion-card>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <ion-card>
+        <ion-card-content>
+          <ion-item>
+            <ion-label>Currency</ion-label>
+            <ion-select [formControl]="currency" interface="popover">
+              @for (c of currencies; track c) {
+                <ion-select-option [value]="c">{{ c }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Amount to settle</ion-label>
+            <ion-input
+              type="number"
+              inputmode="decimal"
+              [formControl]="amount"
+              placeholder="0.00"
+            />
+          </ion-item>
+          @if (amount.touched && amount.invalid) {
+            <ion-note color="danger" class="ion-padding-start">
+              Enter an amount greater than zero.
+            </ion-note>
+          }
+          <ion-note class="ion-padding" color="medium">
+            Records a settling (return) transfer. The balance is netted against
+            outstanding transfers.
+          </ion-note>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="ion-padding">
+        <ion-button
+          expand="block"
+          color="success"
+          type="submit"
+          [disabled]="$submitting() || form.invalid"
+        >
+          @if ($submitting()) {
+            <ion-spinner name="dots" slot="start" />
+            Settling…
+          } @else {
+            Record settlement
+          }
+        </ion-button>
+      </div>
+    </form>
+  }
+</ion-content>

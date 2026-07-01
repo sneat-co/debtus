@@ -71,6 +71,9 @@ importers:
       '@sneat/components':
         specifier: 0.8.0
         version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(@ionic/angular@8.8.6(0a9b76cd9bc4601e385662289c29b800))
+      '@sneat/contactus-services':
+        specifier: npm:@sneat/extension-contactus-internal@0.12.3
+        version: '@sneat/extension-contactus-internal@0.12.3(5d41878cbc159d271e4b09cab41fd001)'
       '@sneat/core':
         specifier: 0.8.0
         version: 0.8.0(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -93,8 +96,8 @@ importers:
         specifier: 0.12.1
         version: 0.12.1(@angular/common@21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))
       '@sneat/extension-contactus-internal':
-        specifier: 0.12.2
-        version: 0.12.2(5d41878cbc159d271e4b09cab41fd001)
+        specifier: 0.12.3
+        version: 0.12.3(5d41878cbc159d271e4b09cab41fd001)
       '@sneat/extension-contactus-shared':
         specifier: 0.12.2
         version: 0.12.2(d0f3f8367b22e914c08882965e2b3044)
@@ -4091,8 +4094,8 @@ packages:
       '@angular/common': '>=21.0.0'
       '@angular/core': '>=21.0.0'
 
-  '@sneat/extension-contactus-internal@0.12.2':
-    resolution: {integrity: sha512-QVSHc1qx5roWZRDVMtYWD8m2xN9d247gW3mFbcN6Pzzn+xFPbggipxhZuHXSDxRynFbTZCtQGjnV+6SsKS8XyQ==}
+  '@sneat/extension-contactus-internal@0.12.3':
+    resolution: {integrity: sha512-+Gzc5cSTJ9zq+BzcW1So1Ua7TkgGK2r0npch3bCR2pKv4zVi+/sk0OB5dOLPnM63NW1173jQ8meyDtl2FVLDIg==}
     peerDependencies:
       '@angular/common': ^21.0.0
       '@angular/core': ^21.0.0
@@ -15184,7 +15187,7 @@ snapshots:
       '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
       tslib: 2.8.1
 
-  '@sneat/extension-contactus-internal@0.12.2(5d41878cbc159d271e4b09cab41fd001)':
+  '@sneat/extension-contactus-internal@0.12.3(5d41878cbc159d271e4b09cab41fd001)':
     dependencies:
       '@angular/common': 21.2.9(@angular/core@21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/core': 21.2.9(@angular/compiler@21.2.9)(rxjs@7.8.2)(zone.js@0.16.0)
