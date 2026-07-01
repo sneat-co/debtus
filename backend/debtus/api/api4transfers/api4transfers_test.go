@@ -95,7 +95,7 @@ func TestHandleGetTransfer_missingID(t *testing.T) {
 	// No "id" query param → GetStrID returns "" → handler returns early
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer", nil)
-	HandleGetTransfer(context.Background(), w, r)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u1"})
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("expected 400, got %d", w.Code)
 	}
@@ -162,7 +162,7 @@ func TestHandleGetTransfer_withID_dbError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
-	HandleGetTransfer(context.Background(), w, r)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u1"})
 	if w.Code == http.StatusOK {
 		t.Error("expected non-200 status when DB fails")
 	}
@@ -215,9 +215,53 @@ func TestHandleGetTransfer_success(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
-	HandleGetTransfer(context.Background(), w, r)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u1"})
 	if w.Code != http.StatusOK {
 		t.Errorf("expected 200, got %d; body: %s", w.Code, w.Body.String())
+	}
+}
+
+// TestHandleGetTransfer_forbidden verifies SEC-1: an authenticated user who is
+// neither party to the transfer nor an admin must be rejected with 403.
+func TestHandleGetTransfer_forbidden(t *testing.T) {
+	origFn := getTransferByIDFn4transfers
+	defer func() { getTransferByIDFn4transfers = origFn }()
+	getTransferByIDFn4transfers = func(_ context.Context, _ dal.ReadSession, _ string) (models4debtus.TransferEntry, error) {
+		return makeTransfer4transfers("u1", "u2"), nil
+	}
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u3"})
+	if w.Code != http.StatusForbidden {
+		t.Errorf("expected 403 for non-party caller, got %d", w.Code)
+	}
+}
+
+// TestHandleGetTransfer_adminAllowed verifies an admin caller (not a party to
+// the transfer) is still allowed through, matching the HandleGetContact pattern.
+func TestHandleGetTransfer_adminAllowed(t *testing.T) {
+	origFn := getTransferByIDFn4transfers
+	defer func() { getTransferByIDFn4transfers = origFn }()
+	getTransferByIDFn4transfers = func(_ context.Context, _ dal.ReadSession, _ string) (models4debtus.TransferEntry, error) {
+		return makeTransfer4transfers("u1", "u2"), nil
+	}
+
+	origCheck := checkTransferCreatorNameFn4transfers
+	defer func() { checkTransferCreatorNameFn4transfers = origCheck }()
+	checkTransferCreatorNameFn4transfers = func(_ context.Context, _ dal.ReadwriteTransaction, _ models4debtus.TransferEntry) error {
+		return nil
+	}
+
+	origDB := facade.GetSneatDB
+	defer func() { facade.GetSneatDB = origDB }()
+	facade.GetSneatDB = makeRunTxDB(t)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "admin1", IsAdmin: true})
+	if w.Code != http.StatusOK {
+		t.Errorf("expected 200 for admin caller, got %d; body: %s", w.Code, w.Body.String())
 	}
 }
 
@@ -230,7 +274,7 @@ func TestHandleGetTransfer_transferNotFound(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
-	HandleGetTransfer(context.Background(), w, r)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u1"})
 	if w.Code == http.StatusOK {
 		t.Error("expected non-200 when transfer not found")
 	}
@@ -255,7 +299,7 @@ func TestHandleGetTransfer_checkCreatorError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/api4debtus/transfer?id=t1", nil)
-	HandleGetTransfer(context.Background(), w, r)
+	HandleGetTransfer(context.Background(), w, r, token4auth.AuthInfo{UserID: "u1"})
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("expected 500, got %d", w.Code)
 	}
