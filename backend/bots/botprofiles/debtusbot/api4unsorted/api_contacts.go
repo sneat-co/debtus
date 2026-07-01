@@ -201,7 +201,10 @@ func HandleDeleteContact(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return
 	}
 	logus.Debugf(ctx, "contactID: %v", contactID)
-	userCtx := newUserContext("")
+	// Fable refactoring (SEC-2): previously built an empty/anonymous userCtx
+	// (newUserContext("")) instead of the authenticated caller, so
+	// deleteContact() had no real caller identity to check membership against.
+	userCtx := newUserContext(authInfo.UserID)
 	if err := deleteContact(ctx, userCtx, spaceID, contactID); err != nil {
 		common4all.InternalError(ctx, w, err)
 		return

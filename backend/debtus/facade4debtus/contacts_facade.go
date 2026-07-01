@@ -15,6 +15,7 @@ import (
 	"github.com/sneat-co/contactus/backend/dto4contactus"
 	"github.com/sneat-co/debtus/backend/debtus/dal4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
+	"github.com/sneat-co/sneat-core-modules/spaceus/dbo4spaceus"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dto4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/coretypes"
@@ -323,6 +324,21 @@ func DeleteContact(ctx context.Context, userCtx facade.UserContext, spaceID core
 
 func DeleteContactTx(ctx context.Context, userCtx facade.UserContext, tx dal.ReadwriteTransaction, spaceID coretypes.SpaceID, contactID string) (err error) {
 	logus.Warningf(ctx, "ContactDal.DeleteContact(%s)", contactID)
+
+	// Fable refactoring (SEC-2): userCtx used to be accepted but never checked,
+	// allowing any authenticated caller to delete any contact in any space by
+	// just passing spaceID/contactID query params. Enforce space membership.
+	if userCtx == nil || userCtx.GetUserID() == "" {
+		return fmt.Errorf("%w: userCtx with a userID is required to delete a contact", facade.ErrUnauthorized)
+	}
+	space := dbo4spaceus.NewSpaceEntry(spaceID)
+	if err = tx.Get(ctx, space.Record); err != nil {
+		return fmt.Errorf("failed to load space record to verify membership: %w", err)
+	}
+	if !space.Data.HasUser(userCtx.GetUserID()) {
+		return fmt.Errorf("%w: user %s is not a member of space %s", facade.ErrUnauthorized, userCtx.GetUserID(), spaceID)
+	}
+
 	var contact models4debtus.DebtusSpaceContactEntry
 	if contact, err = GetDebtusSpaceContactByID(ctx, tx, spaceID, contactID); err != nil {
 		if dal.IsNotFound(err) {
