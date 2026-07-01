@@ -1,0 +1,94 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="debtus-contacts" />
+    </ion-buttons>
+    <ion-title>{{ $contact()?.title ?? 'Contact' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  @if ($loading()) {
+    <div class="ion-padding ion-text-center">
+      <ion-spinner name="dots" />
+    </div>
+  } @else if ($error()) {
+    <div class="ion-padding">
+      <ion-note color="danger">{{ $error() }}</ion-note>
+    </div>
+  } @else {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Balance</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ formatSignedBalance($contact()?.balance ?? {}) }}
+        @if ($contact()?.counterpartySpaceID) {
+          <p>
+            <ion-note color="medium">
+              Cross-space loan — counterparty is in space
+              {{ $contact()?.counterpartySpaceID }}.
+            </ion-note>
+          </p>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <ion-button expand="block" (click)="recordLend()">
+          <ion-icon name="arrow-up-outline" slot="start" />
+          Record what I lent
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="recordBorrow()">
+          <ion-icon name="arrow-down-outline" slot="start" />
+          Record what I borrowed
+        </ion-button>
+        <ion-button expand="block" fill="clear" (click)="remind()">
+          <ion-icon name="notifications-outline" slot="start" />
+          Remind
+        </ion-button>
+        <ion-button
+          expand="block"
+          color="success"
+          fill="outline"
+          (click)="settleUp()"
+        >
+          <ion-icon name="checkmark-done-outline" slot="start" />
+          Settle up
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>History</ion-card-title>
+      </ion-card-header>
+      @if ($transfers().length) {
+        <ion-list>
+          @for (t of $transfers(); track t.id) {
+            <ion-item button (click)="openTransfer(t.id)">
+              <ion-label>
+                <h2>
+                  {{ t.direction === 'lend' ? 'You lent' : 'You borrowed' }}
+                  @if (t.isReturn) { (return) }
+                </h2>
+                <p>{{ t.note || (t.created | date: 'mediumDate') }}</p>
+              </ion-label>
+              <ion-badge
+                slot="end"
+                [color]="t.direction === 'lend' ? 'success' : 'warning'"
+              >
+                {{ formatAmount(t.amount) }}
+              </ion-badge>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-card-content>
+          <ion-note>No transfers with this contact yet.</ion-note>
+        </ion-card-content>
+      }
+    </ion-card>
+  }
+</ion-content>

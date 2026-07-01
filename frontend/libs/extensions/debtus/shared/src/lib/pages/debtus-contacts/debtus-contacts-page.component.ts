@@ -2,85 +2,59 @@ import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonBackButton,
-  IonBadge,
-  IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
   IonHeader,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonNote,
   IonSpinner,
+  IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import {
   DEBTUS_SERVICE,
-  IBalanceSummary,
   IContactBalance,
-  formatAmount,
   formatSignedBalance,
-  isZeroBalance,
-  summarizeBalances,
 } from '@sneat/extension-debtus-contract';
 import {
   SpaceComponentBaseParams,
   SpacePageBaseComponent,
-  SpacePageTitleComponent,
 } from '@sneat/space-components';
-import { SpaceServiceModule } from '@sneat/space-services';
 import { ClassName } from '@sneat/ui';
 import { switchMap } from 'rxjs';
 
-// Home / balances screen — the debtus entry point. Mirrors the bot's
-// `debts_balance` view: a net summary of who owes the user and whom the user
-// owes, plus quick actions into contacts and creating a transfer.
+// Contacts list — counterparties (contactus space contacts) with their net
+// balance. Tap a row to open the per-contact detail.
 @Component({
-  selector: 'sneat-debtus-home-page',
-  templateUrl: './debtus-home-page.component.html',
+  selector: 'sneat-debtus-contacts-page',
+  templateUrl: './debtus-contacts-page.component.html',
   imports: [
-    SpacePageTitleComponent,
-    SpaceServiceModule,
     IonHeader,
     IonToolbar,
     IonButtons,
     IonBackButton,
+    IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
     IonNote,
-    IonBadge,
-    IonButton,
-    IonIcon,
     IonSpinner,
   ],
   providers: [
-    { provide: ClassName, useValue: 'DebtusHomePageComponent' },
+    { provide: ClassName, useValue: 'DebtusContactsPageComponent' },
     SpaceComponentBaseParams,
   ],
 })
-export class DebtusHomePageComponent extends SpacePageBaseComponent {
+export class DebtusContactsPageComponent extends SpacePageBaseComponent {
   private readonly debtusService = inject(DEBTUS_SERVICE);
 
   protected readonly $loading = signal(true);
   protected readonly $error = signal<string | undefined>(undefined);
   protected readonly $contacts = signal<IContactBalance[]>([]);
-  protected readonly $summary = signal<IBalanceSummary>({
-    theyOweYou: [],
-    youOwe: [],
-  });
 
-  protected readonly formatAmount = formatAmount;
   protected readonly formatSignedBalance = formatSignedBalance;
 
   constructor() {
@@ -96,28 +70,18 @@ export class DebtusHomePageComponent extends SpacePageBaseComponent {
       )
       .subscribe({
         next: (contacts) => {
-          const active = contacts.filter((c) => !isZeroBalance(c.balance));
-          this.$contacts.set(active);
-          this.$summary.set(summarizeBalances(contacts));
+          this.$contacts.set(contacts);
           this.$loading.set(false);
         },
         error: (err) => {
-          this.$error.set('Failed to load balances');
+          this.$error.set('Failed to load contacts');
           this.$loading.set(false);
-          this.errorLogger.logError(err, 'Failed to load contact balances');
+          this.errorLogger.logError(err, 'Failed to load debtus contacts');
         },
       });
   }
 
-  protected goContacts(): void {
-    this.spaceNav.navigateForwardToSpacePage(this.space, 'debtus-contacts');
-  }
-
-  protected goNewTransfer(): void {
-    this.spaceNav.navigateForwardToSpacePage(this.space, 'new-transfer');
-  }
-
-  protected goContact(contactID: string): void {
+  protected openContact(contactID: string): void {
     this.spaceNav.navigateForwardToSpacePage(
       this.space,
       `debtus-contact/${contactID}`,

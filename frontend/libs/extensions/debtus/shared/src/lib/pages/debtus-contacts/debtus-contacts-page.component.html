@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="debts" />
+    </ion-buttons>
+    <ion-title>Contacts</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  @if ($loading()) {
+    <div class="ion-padding ion-text-center">
+      <ion-spinner name="dots" />
+    </div>
+  } @else if ($error()) {
+    <div class="ion-padding">
+      <ion-note color="danger">{{ $error() }}</ion-note>
+    </div>
+  } @else if ($contacts().length) {
+    <ion-list>
+      @for (c of $contacts(); track c.contactID) {
+        <ion-item button (click)="openContact(c.contactID)">
+          <ion-label>
+            <h2>{{ c.title }}</h2>
+            <p>{{ formatSignedBalance(c.balance) }}</p>
+            @if (c.counterpartySpaceID) {
+              <ion-note color="medium"
+                >cross-space · {{ c.counterpartySpaceID }}</ion-note
+              >
+            }
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <div class="ion-padding ion-text-center">
+      <ion-note>No contacts with debts yet.</ion-note>
+    </div>
+  }
+</ion-content>

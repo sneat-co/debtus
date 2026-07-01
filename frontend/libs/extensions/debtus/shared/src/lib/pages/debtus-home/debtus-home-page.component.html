@@ -1,9 +1,8 @@
 <ion-header>
   <ion-toolbar color="light" class="with-back-button with-end-buttons">
     <ion-buttons slot="start">
-      <!-- This is the top page of a space, so "back" should leave the space and
-           return to the app home (the spaces list), not to the space's own root
-           (which redirects straight back here). -->
+      <!-- This is the top page of a space, so "back" leaves the space and
+           returns to the app home (the spaces list). -->
       <ion-back-button defaultHref="/" />
     </ion-buttons>
     <sneat-space-page-title
@@ -11,26 +10,93 @@
       generalTitle="Debts"
       icon="💸"
       [titlesBySpaceType]="{
-        personal: 'Personal contacts',
-        family: 'Family contacts',
+        personal: 'Personal debts',
+        family: 'Family debts',
       }"
     />
-    <!--		<ion-buttons slot="end">-->
-    <!--			<ion-button-->
-    <!--				*ngIf="canAdd"-->
-    <!--				color="primary"-->
-    <!--				size="small"-->
-    <!--				(click)="goNewContact()"-->
-    <!--				[title]="'Add contact'"-->
-    <!--			>-->
-    <!--				<ion-icon name="add" />-->
-    <!--				Add-->
-    <!--			</ion-button>-->
-    <!--			<ion-menu-button />-->
-    <!--		</ion-buttons>-->
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="cardy">
-  <sneat-debtus-new-debt-form [space]="space" [contact]="undefined" />
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Balance</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if ($loading()) {
+        <ion-spinner name="dots" />
+      } @else if ($error()) {
+        <ion-note color="danger">{{ $error() }}</ion-note>
+      } @else {
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label>They owe you</ion-label>
+            @if ($summary().theyOweYou.length) {
+              @for (a of $summary().theyOweYou; track a.currency) {
+                <ion-badge slot="end" color="success">{{
+                  formatAmount(a)
+                }}</ion-badge>
+              }
+            } @else {
+              <ion-note slot="end">—</ion-note>
+            }
+          </ion-item>
+          <ion-item>
+            <ion-label>You owe</ion-label>
+            @if ($summary().youOwe.length) {
+              @for (a of $summary().youOwe; track a.currency) {
+                <ion-badge slot="end" color="warning">{{
+                  formatAmount(a)
+                }}</ion-badge>
+              }
+            } @else {
+              <ion-note slot="end">—</ion-note>
+            }
+          </ion-item>
+        </ion-list>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-content>
+      <ion-button expand="block" (click)="goNewTransfer()">
+        <ion-icon name="add" slot="start" />
+        New transfer
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="goContacts()">
+        <ion-icon name="people-outline" slot="start" />
+        Contacts
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  @if (!$loading() && !$error()) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>By contact</ion-card-title>
+      </ion-card-header>
+      @if ($contacts().length) {
+        <ion-list>
+          @for (c of $contacts(); track c.contactID) {
+            <ion-item button (click)="goContact(c.contactID)">
+              <ion-label>
+                <h2>{{ c.title }}</h2>
+                <p>{{ formatSignedBalance(c.balance) }}</p>
+                @if (c.counterpartySpaceID) {
+                  <ion-note color="medium">
+                    cross-space · {{ c.counterpartySpaceID }}
+                  </ion-note>
+                }
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-card-content>
+          <ion-note>Everyone is settled up. 🎉</ion-note>
+        </ion-card-content>
+      }
+    </ion-card>
+  }
 </ion-content>

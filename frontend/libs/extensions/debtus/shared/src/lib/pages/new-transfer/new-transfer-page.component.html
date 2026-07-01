@@ -1,0 +1,105 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="debts" />
+    </ion-buttons>
+    <ion-title>New transfer</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <ion-card>
+      <ion-card-content>
+        <ion-segment [formControl]="direction">
+          <ion-segment-button value="lend">
+            <ion-label>I lent</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="borrow">
+            <ion-label>I borrowed</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ion-note class="ion-padding-start" color="medium">
+          {{
+            direction.value === 'lend'
+              ? 'You gave money — they owe you.'
+              : 'You got money — you owe them.'
+          }}
+        </ion-note>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <!-- Reuse the contactus space-contact picker. The counterparty is a
+             real contactus contact, not a debtus-private person. -->
+        <sneat-contact-input
+          [space]="space"
+          label="Counterparty"
+          [canChangeContact]="true"
+          (contactChange)="onContactChanged($event)"
+        />
+        <ion-item>
+          <ion-label position="stacked">
+            Or new counterparty name
+          </ion-label>
+          <ion-input
+            [formControl]="counterpartyName"
+            placeholder="e.g. Alex"
+            autocapitalize="words"
+          />
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Currency</ion-label>
+          <ion-select [formControl]="currency" interface="popover">
+            @for (c of currencies; track c) {
+              <ion-select-option [value]="c">{{ c }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Amount</ion-label>
+          <ion-input
+            type="number"
+            inputmode="decimal"
+            [formControl]="amount"
+            placeholder="0.00"
+          />
+        </ion-item>
+        @if (amount.touched && amount.invalid) {
+          <ion-note color="danger" class="ion-padding-start">
+            Enter an amount greater than zero.
+          </ion-note>
+        }
+        <ion-item>
+          <ion-label position="stacked">Note (optional)</ion-label>
+          <ion-textarea
+            [formControl]="note"
+            placeholder="What is it for?"
+            [autoGrow]="true"
+          />
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="ion-padding">
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="$submitting() || form.invalid"
+      >
+        @if ($submitting()) {
+          <ion-spinner name="dots" slot="start" />
+          Saving…
+        } @else {
+          Record transfer
+        }
+      </ion-button>
+    </div>
+  </form>
+</ion-content>
