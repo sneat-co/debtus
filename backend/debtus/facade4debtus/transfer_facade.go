@@ -136,7 +136,7 @@ func (transferFacade TransfersFacade) CreateTransfer(ctx context.Context, input 
 				if v, ok := contactBalance[input.Request.Amount.Currency]; !ok || v == 0 {
 					logus.Debugf(ctx, "No need to check for outstanding api4transfers as contacts balance is 0")
 				} else {
-					if input.Request.Interest.HasInterest() {
+					if input.Request.Interest != nil && input.Request.Interest.HasInterest() {
 						if d := input.Direction(); d == models4debtus.TransferDirectionUser2Counterparty && v < 0 || d == models4debtus.TransferDirectionCounterparty2User && v > 0 {
 							err = ErrAttemptToCreateDebtWithInterestAffectingOutstandingTransfers
 							return
@@ -327,22 +327,48 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 	output.To = new(ParticipantEntries)
 	from, to := input.From, input.To
 
-	records := make([]dal.Record, 0, 4+len(returnToTransferIDs))
+	output.From.SpaceID = from.SpaceID
+	output.To.SpaceID = to.SpaceID
+
+	records := make([]dal.Record, 0, 8+len(returnToTransferIDs))
 	if from.UserID != "" {
-		output.From.User.ID = from.UserID
+		output.From.User = dbo4userus.NewUserEntry(from.UserID)
 		records = append(records, output.From.User.Record)
 	}
 	if to.UserID != "" {
-		output.To.User.ID = to.UserID
+		output.To.User = dbo4userus.NewUserEntry(to.UserID)
 		records = append(records, output.To.User.Record)
 	}
+	// Cross-space convention: a side's ContactID identifies a contact record
+	// that lives in the OTHER side's own space — e.g. `to.ContactID` is the
+	// contact the "from" user/space uses to refer to "to" (mirrors
+	// CreateTransferInput.CreatorContactID(), which reads the OPPOSITE side's
+	// ContactID as "the creator's own contact ID for the counterparty").
+	// In the ordinary same-space case from.SpaceID == to.SpaceID so this is a
+	// no-op; for genuine cross-space lending each side keeps its own SpaceID.
 	if from.ContactID != "" {
-		output.From.Contact.ID = from.ContactID
-		records = append(records, output.From.Contact.Record)
+		output.From.Contact = dal4contactus.NewContactEntry(to.SpaceID, from.ContactID)
+		output.From.DebtusContact = models4debtus.NewDebtusSpaceContactEntry(to.SpaceID, from.ContactID, nil)
+		records = append(records, output.From.Contact.Record, output.From.DebtusContact.Record)
 	}
 	if to.ContactID != "" {
-		output.To.Contact.ID = to.ContactID
-		records = append(records, output.To.Contact.Record)
+		output.To.Contact = dal4contactus.NewContactEntry(from.SpaceID, to.ContactID)
+		output.To.DebtusContact = models4debtus.NewDebtusSpaceContactEntry(from.SpaceID, to.ContactID, nil)
+		records = append(records, output.To.Contact.Record, output.To.DebtusContact.Record)
+	}
+	// DebtusSpace (the per-user aggregate ledger) is only meaningful — and
+	// only ever read/written below — for a side that's an actual registered
+	// user (from.UserID/to.UserID != ""); a side that's just a contact
+	// reference has no "own space" to aggregate into. Gating on UserID here
+	// (rather than merely SpaceID != "") also avoids fetching+resaving an
+	// unrelated side's space aggregate on every transfer.
+	if from.UserID != "" {
+		output.From.DebtusSpace = models4debtus.NewDebtusSpaceEntry(from.SpaceID)
+		records = append(records, output.From.DebtusSpace.Record)
+	}
+	if to.UserID != "" {
+		output.To.DebtusSpace = models4debtus.NewDebtusSpaceEntry(to.SpaceID)
+		records = append(records, output.To.DebtusSpace.Record)
 	}
 
 	if err = tx.GetMulti(ctx, records); err != nil {
@@ -352,13 +378,17 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 	fromContact, toContact := output.From.Contact, output.To.Contact
 	fromUser, toUser := output.From.User, output.To.User
 
-	if from.ContactID != "" && output.From.Contact.Data.UserID == "" {
-		err = fmt.Errorf("got bad counterparty entity from DB by id=%s, fromCounterparty.UserID == 0", from.ContactID)
+	// NOTE: existence (not a linked UserID) is what indicates a "bad"/missing
+	// counterparty entity — contacts are commonly NOT linked to a registered
+	// platform user (e.g. tracking a debt with someone who doesn't use the
+	// app), so we must not require Contact.Data.UserID to be non-empty here.
+	if from.ContactID != "" && !output.From.Contact.Record.Exists() {
+		err = fmt.Errorf("got bad counterparty entity from DB by id=%s, fromCounterparty not found", from.ContactID)
 		return
 	}
 
-	if to.ContactID != "" && output.To.Contact.Data.UserID == "" {
-		err = fmt.Errorf("got bad counterparty entity from DB by id=%s, toCounterparty.UserID == 0", to.ContactID)
+	if to.ContactID != "" && !output.To.Contact.Record.Exists() {
+		err = fmt.Errorf("got bad counterparty entity from DB by id=%s, toCounterparty not found", to.ContactID)
 		return
 	}
 
@@ -467,7 +497,9 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 	transferData.DtCreated = dtCreated
 	output.Transfer.Data = transferData
 	input.Source.PopulateTransfer(transferData)
-	transferData.TransferInterest = *input.Request.Interest
+	if input.Request.Interest != nil {
+		transferData.TransferInterest = *input.Request.Interest
+	}
 
 	type TransferReturnInfo struct {
 		Transfer       models4debtus.TransferEntry
@@ -591,7 +623,7 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 	// Set from & to names if needed
 	{
 		fixUserName := func(counterparty *models4debtus.TransferCounterpartyInfo, user dbo4userus.UserEntry) {
-			if counterparty.UserID != "" && counterparty.UserName == "" {
+			if counterparty.UserID != "" && counterparty.UserName == "" && user.Data != nil && user.Data.Names != nil {
 				counterparty.UserName = user.Data.GetFullName()
 			}
 		}
@@ -599,7 +631,7 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 		fixUserName(input.To, output.To.User)
 
 		fixContactName := func(counterparty *models4debtus.TransferCounterpartyInfo, contact dal4contactus.ContactEntry) {
-			if counterparty.ContactID != "" && counterparty.ContactName == "" {
+			if counterparty.ContactID != "" && counterparty.ContactName == "" && contact.Data != nil && contact.Data.Names != nil {
 				counterparty.ContactName = contact.Data.Names.GetFullName()
 			}
 		}
@@ -665,12 +697,12 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 		}
 
 		if output.From.User.ID != "" {
-			if err = transferFacade.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, amountWithoutInterest, output.Transfer, output.From.DebtusSpace, output.To.DebtusContact, closedTransferIDs); err != nil {
+			if err = transferFacade.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, amountWithoutInterest, output.Transfer, output.From.DebtusSpace, output.To.DebtusContact, closedTransferIDs, true); err != nil {
 				return
 			}
 		}
 		if output.To.User.ID != "" {
-			if err = transferFacade.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, amountWithoutInterest, output.Transfer, output.To.DebtusSpace, output.From.DebtusContact, closedTransferIDs); err != nil {
+			if err = transferFacade.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, amountWithoutInterest, output.Transfer, output.To.DebtusSpace, output.From.DebtusContact, closedTransferIDs, false); err != nil {
 				return
 			}
 		}
@@ -745,6 +777,12 @@ func (TransfersFacade) GetTransferByID(ctx context.Context, tx dal.ReadSession, 
 	return
 }
 
+// updateDebtusSpaceAndCounterpartyWithTransferInfo updates the balance of one
+// side's own DebtusSpace (and the DebtusSpaceContactEntry that mirrors the
+// counterparty within it). isFromSide tells us which side debtusSpace
+// belongs to — it can NOT be derived from debtusSpace.ID, which is always
+// const4debtus.ModuleID (e.g. "debtus"), not a UserID; see
+// models4debtus.NewDebtusSpaceEntry.
 func (TransfersFacade) updateDebtusSpaceAndCounterpartyWithTransferInfo(
 	ctx context.Context,
 	amount money.Amount,
@@ -752,16 +790,14 @@ func (TransfersFacade) updateDebtusSpaceAndCounterpartyWithTransferInfo(
 	debtusSpace models4debtus.DebtusSpaceEntry,
 	contact models4debtus.DebtusSpaceContactEntry,
 	closedTransferIDs []string,
+	isFromSide bool,
 ) (err error) {
-	logus.Debugf(ctx, "updateDebtusSpaceAndCounterpartyWithTransferInfo(debtusSpace=%v, Contact=%v)", debtusSpace, contact)
+	logus.Debugf(ctx, "updateDebtusSpaceAndCounterpartyWithTransferInfo(debtusSpace=%v, Contact=%v, isFromSide=%v)", debtusSpace, contact, isFromSide)
 	var val decimal.Decimal64p2
-	switch debtusSpace.ID {
-	case transfer.Data.From().UserID:
+	if isFromSide {
 		val = amount.Value * userBalanceIncreased
-	case transfer.Data.To().UserID:
+	} else {
 		val = amount.Value * userBalanceDecreased
-	default:
-		panic(fmt.Sprintf("debtusSpace is not related to transfer: %v", debtusSpace.ID))
 	}
 	logus.Debugf(ctx, "Updating balance with [%d %v] for debtusSpace #%s, Contact #%s", val, amount.Currency, debtusSpace.ID, contact.ID)
 
@@ -812,7 +848,12 @@ func updateContactWithTransferInfo(
 	contact.Data.AddToBalance(transfer.Data.Currency, val)
 	contact.Data.CountOfTransfers += 1
 
-	if contactTransfersInfo := contact.Data.GetTransfersInfo(); contactTransfersInfo.Last.ID != transfer.ID {
+	contactTransfersInfo := contact.Data.GetTransfersInfo()
+	if contactTransfersInfo == nil {
+		// First-ever transfer for this contact — nothing to carry over yet.
+		contactTransfersInfo = new(models4debtus.UserContactTransfersInfo)
+	}
+	if contactTransfersInfo.Last.ID != transfer.ID {
 		contactTransfersInfo.Count += 1
 		contactTransfersInfo.Last.ID = transfer.ID
 		contactTransfersInfo.Last.At = transfer.Data.DtCreated

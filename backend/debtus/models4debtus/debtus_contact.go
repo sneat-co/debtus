@@ -28,6 +28,7 @@ func NewDebtusContactDbo(details dto4contactus.ContactDetails) *DebtusSpaceConta
 			},
 		},
 		ContactDetails: details,
+		Balanced:       money.Balanced{Balance: make(money.Balance)},
 	}
 }
 
@@ -37,6 +38,11 @@ func NewDebtusSpaceContactEntry(spaceID coretypes.SpaceID, contactID string, dbo
 	key := dbo4spaceus.NewSpaceModuleItemKey(spaceID, const4debtus.ModuleID, const4contactus.ContactsCollection, contactID)
 	if dbo == nil {
 		dbo = new(DebtusSpaceContactDbo)
+	}
+	if dbo.Balance == nil {
+		// Balance must be non-nil so a first-ever transfer can call
+		// money.Balanced.AddToBalance() without panicking on a nil-map write.
+		dbo.Balance = make(money.Balance)
 	}
 	return record.NewDataWithID(contactID, key, dbo)
 }

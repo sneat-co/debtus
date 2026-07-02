@@ -17,15 +17,33 @@ import (
 
 type CreateTransferRequest struct {
 	dto4spaceus.SpaceRequest
-	Direction          models4debtus.TransferDirection `json:"direction"`
-	Amount             money.Amount                    `json:"amount"`
-	FromContactID      string                          `json:"fromContactID"`
-	ToContactID        string                          `json:"toContactID"`
-	BillID             string                          `json:"billID"`
-	IsReturn           bool                            `json:"isReturn,omitempty"`
-	ReturnToTransferID string                          `json:"returnToTransferID,omitempty"`
-	DueOn              *time.Time                      `json:"dueOn,omitempty"`
-	Interest           *models4debtus.TransferInterest `json:"interest,omitempty"`
+	Direction     models4debtus.TransferDirection `json:"direction"`
+	Amount        money.Amount                    `json:"amount"`
+	FromContactID string                          `json:"fromContactID"`
+	ToContactID   string                          `json:"toContactID"`
+	BillID        string                          `json:"billID"`
+	// Note is a free-text annotation from the creator, stored on their own side
+	// of the transfer (TransferCounterpartyInfo.Note).
+	Note string `json:"note,omitempty"`
+	// CounterpartySpaceID is the counterparty contact's OWN space, when it
+	// differs from SpaceID (cross-space lending: the creator operates in
+	// SpaceID, but the contact identified by FromContactID/ToContactID is
+	// tracked in a different space). Optional; defaults to SpaceID (the
+	// ordinary same-space case) when empty.
+	CounterpartySpaceID coretypes.SpaceID               `json:"counterpartySpaceID,omitempty"`
+	IsReturn            bool                            `json:"isReturn,omitempty"`
+	ReturnToTransferID  string                          `json:"returnToTransferID,omitempty"`
+	DueOn               *time.Time                      `json:"dueOn,omitempty"`
+	Interest            *models4debtus.TransferInterest `json:"interest,omitempty"`
+}
+
+// CounterpartySpaceIDOrDefault returns CounterpartySpaceID, falling back to
+// SpaceID (the ordinary same-space case) when it's not set.
+func (v CreateTransferRequest) CounterpartySpaceIDOrDefault() coretypes.SpaceID {
+	if v.CounterpartySpaceID != "" {
+		return v.CounterpartySpaceID
+	}
+	return v.SpaceID
 }
 
 var (
