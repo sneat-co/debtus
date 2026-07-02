@@ -27,6 +27,7 @@ import {
   IonToolbar,
   ToastController,
 } from '@ionic/angular/standalone';
+import { DemoDataBannerComponent } from '../../components/demo-data-banner/demo-data-banner.component';
 import {
   CurrencyCode,
   DEBTUS_SERVICE,
@@ -34,6 +35,7 @@ import {
   ISettleUpRequest,
   formatSignedBalance,
   round2,
+  settleDirectionForBalance,
 } from '@sneat/extension-debtus-contract';
 import {
   SpaceComponentBaseParams,
@@ -49,6 +51,7 @@ import { combineLatest, switchMap } from 'rxjs';
   selector: 'sneat-debtus-settle-up-page',
   templateUrl: './settle-up-page.component.html',
   imports: [
+    DemoDataBannerComponent,
     ReactiveFormsModule,
     IonHeader,
     IonToolbar,
@@ -164,21 +167,30 @@ export class SettleUpPageComponent extends SpacePageBaseComponent {
     ) {
       return;
     }
+    // This page shows the signed balance, so it (not the service) derives the
+    // direction that moves that balance toward zero for the chosen currency.
+    // Deriving it downstream from demo fixtures recorded the wrong direction
+    // for contacts the fixtures don't know about.
+    const balanceValue = this.$contact()?.balance[this.currency.value] ?? 0;
     const request: ISettleUpRequest = {
       spaceID,
       contactID: this.contactID,
       contactTitle: this.$contact()?.title,
       amount: { currency: this.currency.value, value: amount },
       counterpartySpaceID: this.$contact()?.counterpartySpaceID,
+      direction: settleDirectionForBalance(balanceValue),
     };
     this.$submitting.set(true);
     this.debtusService.settleUp(request).subscribe({
       next: (resp) => {
         this.$submitting.set(false);
+        // Hand the created transfer to the details page via router state —
+        // transfer reads are not wired to the live backend yet, so the details
+        // page must not fabricate a receipt from fixtures.
         this.spaceNav.navigateForwardToSpacePage(
           this.space,
           `transfer/${resp.transfer.id}`,
-          { replaceUrl: true },
+          { replaceUrl: true, state: { transfer: resp.transfer } },
         );
       },
       error: (err) => {

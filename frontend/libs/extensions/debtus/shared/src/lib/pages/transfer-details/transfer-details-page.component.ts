@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import {
   IonBackButton,
   IonBadge,
@@ -30,7 +31,7 @@ import {
   SpaceComponentBaseParams,
   SpacePageBaseComponent,
 } from '@sneat/space-components';
-import { combineLatest, switchMap } from 'rxjs';
+import { combineLatest, of, switchMap } from 'rxjs';
 
 // Transfer detail / receipt — amount, parties, date, note, and its effect on
 // the balance. Mirrors the bot's receipt. Offers a settle-up entry.
@@ -62,6 +63,7 @@ import { combineLatest, switchMap } from 'rxjs';
 })
 export class TransferDetailsPageComponent extends SpacePageBaseComponent {
   private readonly debtusService = inject(DEBTUS_SERVICE);
+  private readonly router = inject(Router);
 
   protected readonly $loading = signal(true);
   protected readonly $error = signal<string | undefined>(undefined);
@@ -72,12 +74,23 @@ export class TransferDetailsPageComponent extends SpacePageBaseComponent {
   constructor() {
     super();
     this.$defaultBackUrlSpacePath.set('debts');
+    // A transfer just created by the new-transfer/settle-up pages is handed
+    // over via router `state` (it survives reloads through history.state).
+    // Prefer it: transfer reads are not wired to the live backend yet, so
+    // fetching a REAL transfer's id would fail — and it must fail rather than
+    // fabricate a receipt from fixtures.
+    const stateTransfer = (
+      this.router.getCurrentNavigation()?.extras?.state ?? history.state
+    )?.['transfer'] as IDebtusTransfer | undefined;
     combineLatest([this.spaceIDChanged$, this.route.paramMap])
       .pipe(
         switchMap(([spaceID, params]) => {
           const transferID = params.get('transferID') ?? '';
           this.$loading.set(true);
           this.$error.set(undefined);
+          if (stateTransfer?.id === transferID) {
+            return of(stateTransfer);
+          }
           return this.debtusService.getTransfer(spaceID ?? '', transferID);
         }),
         takeUntilDestroyed(),

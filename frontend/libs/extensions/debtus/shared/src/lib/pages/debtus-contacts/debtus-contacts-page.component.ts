@@ -13,6 +13,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { DemoDataBannerComponent } from '../../components/demo-data-banner/demo-data-banner.component';
 import {
   DEBTUS_SERVICE,
   IContactBalance,
@@ -31,6 +32,7 @@ import { switchMap } from 'rxjs';
   selector: 'sneat-debtus-contacts-page',
   templateUrl: './debtus-contacts-page.component.html',
   imports: [
+    DemoDataBannerComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

@@ -39,6 +39,18 @@
           [canChangeContact]="true"
           (contactChange)="onContactChanged($event)"
         />
+        @if (prefilledContactID) {
+          <ion-note class="ion-padding-start" color="medium">
+            Recording against
+            {{ counterpartyName.value || prefilledContactID }}
+          </ion-note>
+        }
+        <!-- Fable refactoring: the "Or new counterparty name" free-text input
+             is disabled — a name-only counterparty always 400s server-side
+             (POST create-transfer requires a real contact id; see
+             resolveCounterparty() in the component). Re-enable once a
+             create-contact-then-transfer flow exists. Kept per the no-delete
+             policy:
         <ion-item>
           <ion-label position="stacked">
             Or new counterparty name
@@ -49,6 +61,7 @@
             autocapitalize="words"
           />
         </ion-item>
+        -->
       </ion-card-content>
     </ion-card>
 
