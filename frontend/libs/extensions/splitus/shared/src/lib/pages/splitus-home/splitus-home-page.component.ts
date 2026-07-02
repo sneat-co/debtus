@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonHeader,
+  IonIcon,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ContactusServicesModule } from '@sneat/extension-contactus-internal';
-import { NewSplitFormComponent } from '../../components';
 import {
   SpaceComponentBaseParams,
   SpacePageTitleComponent,
@@ -16,19 +18,23 @@ import {
 import { SpaceServiceModule } from '@sneat/space-services';
 import { ClassName } from '@sneat/ui';
 
+// Splits home — the splitus entry point for a space. Offers the "New split"
+// action (→ new-split); the splits list itself is a later task.
 @Component({
   selector: 'sneat-splitus-home-page',
   templateUrl: './splitus-home-page.component.html',
   imports: [
     SpacePageTitleComponent,
-    NewSplitFormComponent,
-    ContactusServicesModule,
     SpaceServiceModule,
     IonHeader,
     IonToolbar,
     IonButtons,
     IonBackButton,
     IonContent,
+    IonCard,
+    IonCardContent,
+    IonButton,
+    IonIcon,
   ],
   providers: [
     {
@@ -38,4 +44,8 @@ import { ClassName } from '@sneat/ui';
     SpaceComponentBaseParams,
   ],
 })
-export class SplitusHomePageComponent extends SpacePageBaseComponent {}
+export class SplitusHomePageComponent extends SpacePageBaseComponent {
+  protected goNewSplit(): void {
+    this.spaceNav.navigateForwardToSpacePage(this.space, 'new-split');
+  }
+}

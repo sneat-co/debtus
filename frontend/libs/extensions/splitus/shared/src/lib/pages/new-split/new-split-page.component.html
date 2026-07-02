@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
+    </ion-buttons>
+    <ion-title>New split</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  <sneat-splitus-new-split-form
+    [space]="space"
+    [currentUserID]="currentUserId"
+  />
+</ion-content>

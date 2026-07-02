@@ -23,7 +23,7 @@ export const splitusSpaceRoutes: Route[] = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'debts',
+        redirectTo: 'splits',
       },
       ...spacePagesRoutes,
     ],

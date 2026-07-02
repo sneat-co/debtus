@@ -11,26 +11,20 @@
       generalTitle="Splits"
       icon="💸"
       [titlesBySpaceType]="{
-        personal: 'Personal contacts',
-        family: 'Family contacts',
+        personal: 'Personal splits',
+        family: 'Family splits',
       }"
     />
-    <!--		<ion-buttons slot="end">-->
-    <!--			<ion-button-->
-    <!--				*ngIf="canAdd"-->
-    <!--				color="primary"-->
-    <!--				size="small"-->
-    <!--				(click)="goNewContact()"-->
-    <!--				[title]="'Add contact'"-->
-    <!--			>-->
-    <!--				<ion-icon name="add" />-->
-    <!--				Add-->
-    <!--			</ion-button>-->
-    <!--			<ion-menu-button />-->
-    <!--		</ion-buttons>-->
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="cardy">
-  <sneat-splitus-new-split-form [space]="space" [contact]="undefined" />
+  <ion-card>
+    <ion-card-content>
+      <ion-button expand="block" (click)="goNewSplit()">
+        <ion-icon name="add" slot="start" />
+        New split
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

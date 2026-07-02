@@ -1,21 +1,155 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>New split</ion-card-title>
+    <ion-card-title>Expense</ion-card-title>
   </ion-card-header>
   <ion-item>
-    <ion-label>Currency</ion-label>
-    <ion-select [formControl]="currency" placeholder="Select Currency">
-      @for (currency of currencies; track currency) {
-        <ion-select-option [value]="currency">{{ currency }}</ion-select-option>
+    <ion-input
+      label="Title (optional)"
+      labelPlacement="stacked"
+      [formControl]="title"
+      placeholder="e.g. Dinner at Luigi's"
+      autocapitalize="sentences"
+    />
+  </ion-item>
+  <ion-item>
+    <ion-select
+      label="Currency"
+      interface="popover"
+      [formControl]="currency"
+    >
+      @for (c of currencies; track c) {
+        <ion-select-option [value]="c">{{ c }}</ion-select-option>
       }
     </ion-select>
   </ion-item>
   <ion-item>
-    <ion-label>Amount</ion-label>
-    <ion-input type="number" [formControl]="amount" />
+    <ion-input
+      label="Amount"
+      labelPlacement="stacked"
+      type="number"
+      inputmode="decimal"
+      [formControl]="amount"
+      placeholder="0.00"
+    />
   </ion-item>
-
-  <!--	<sneat-contact-input [team]="team" />-->
-
-  <ion-button (click)="submit()">Add split</ion-button>
+  @if (amount.touched && amount.invalid) {
+    <ion-note color="danger" class="ion-padding-start">
+      Enter an amount greater than zero.
+    </ion-note>
+  }
 </ion-card>
+
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Participants</ion-card-title>
+  </ion-card-header>
+  <!-- The payer (you) is always a participant. -->
+  <ion-item>
+    <ion-label>You (payer)</ion-label>
+    <ion-note slot="end" color="medium">always included</ion-note>
+  </ion-item>
+  <!-- Participants come from the space's existing contactus people —
+       there is deliberately no free-text name entry here. -->
+  @for (contact of $participantChoices() ?? []; track contact.id) {
+    <ion-item>
+      <ion-checkbox
+        labelPlacement="end"
+        justify="start"
+        [checked]="$selectedContactIDs().includes(contact.id)"
+        (ionChange)="onParticipantChecked(contact.id, $event)"
+      >
+        {{ contact.title }}
+      </ion-checkbox>
+    </ion-item>
+  } @empty {
+    <ion-item lines="none">
+      @if ($contactsError()) {
+        <ion-label color="danger">{{ $contactsError() }}</ion-label>
+      } @else if ($contacts()) {
+        <ion-label color="medium" class="ion-text-wrap">
+          No contacts yet. Add people to this space first — splits are shared
+          with the space's existing contacts.
+        </ion-label>
+      } @else {
+        <ion-label color="medium">Loading…</ion-label>
+      }
+    </ion-item>
+  }
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>How to split</ion-card-title>
+  </ion-card-header>
+  <ion-segment
+    [value]="$splitMode()"
+    (ionChange)="onSplitModeChange($event)"
+  >
+    <ion-segment-button value="equally">
+      <ion-label>Equally</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="exact-amount">
+      <ion-label>Amounts</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="percentage">
+      <ion-label>Percentages</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  @if ($splitMode() !== 'equally') {
+    @for (row of $shareRows(); track row.id) {
+      <ion-item>
+        <ion-input
+          [label]="row.title"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="decimal"
+          [placeholder]="$splitMode() === 'percentage' ? '0' : '0.00'"
+          [value]="shareValue(row.id)"
+          (ionInput)="onShareInput(row.id, $event)"
+        />
+        @if ($splitMode() === 'percentage') {
+          <ion-note slot="end">%</ion-note>
+        }
+      </ion-item>
+    }
+    <!-- Live reconciliation: submit stays blocked until shares sum to the
+         total (or percentages to 100%). -->
+    @if ($reconciliation(); as reconciliation) {
+      @if (!reconciliation.ok) {
+        <ion-note color="danger" class="ion-padding-start">
+          {{ reconciliation.error }}
+        </ion-note>
+      } @else {
+        <ion-note color="success" class="ion-padding-start">
+          Shares reconcile to the total. ✓
+        </ion-note>
+      }
+    }
+  } @else {
+    <ion-item lines="none">
+      <ion-note color="medium">
+        The total is split equally between you and the selected participants.
+      </ion-note>
+    </ion-item>
+  }
+</ion-card>
+
+<div class="ion-padding">
+  <ion-button
+    expand="block"
+    color="primary"
+    [disabled]="$submitting() || !$canSubmit()"
+    (click)="submit()"
+  >
+    @if ($submitting()) {
+      <ion-spinner name="dots" slot="start" />
+      Creating…
+    } @else {
+      Create split
+    }
+  </ion-button>
+  @if ($submitError()) {
+    <ion-note color="danger">{{ $submitError() }}</ion-note>
+  }
+</div>

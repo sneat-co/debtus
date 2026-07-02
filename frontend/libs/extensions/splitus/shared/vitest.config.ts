@@ -22,9 +22,14 @@ const ionicComponentsDirImportFix = {
 export default defineConfig({
   plugins: [ionicComponentsDirImportFix],
   ssr: {
-    noExternal: [/@ionic\//],
+    // @sneat packages share the same problem class: their esm2022 entries use
+    // extensionless './index' imports that Node's strict ESM resolver rejects
+    // when loaded natively (hit transitively via
+    // @sneat/extension-contactus-contract → @sneat/core). Inlining routes them
+    // through Vite's resolver, which accepts directory/extensionless imports.
+    noExternal: [/@ionic\//, /@sneat\//],
   },
   test: {
-    server: { deps: { inline: [/@ionic/] } },
+    server: { deps: { inline: [/@ionic/, /@sneat/] } },
   },
 });

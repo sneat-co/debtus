@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
+    </ion-buttons>
+    <ion-title>{{ $split()?.title || 'Split' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cardy">
+  @if ($loading()) {
+    <ion-card>
+      <ion-card-content>
+        <ion-spinner name="lines" class="ion-margin-end" />
+        Loading…
+      </ion-card-content>
+    </ion-card>
+  } @else if ($error()) {
+    <ion-card>
+      <ion-card-content>
+        <ion-note color="danger">{{ $error() }}</ion-note>
+      </ion-card-content>
+    </ion-card>
+  } @else if ($split(); as split) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          {{ split.title || 'Split' }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Total: {{ split.amount.toFixed(2) }} {{ split.currency }}
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Participants</ion-card-title>
+      </ion-card-header>
+      <ion-list>
+        @for (p of split.participants; track $index) {
+          <ion-item>
+            <ion-label>
+              <h2>{{ p.name }}{{ p.isPayer ? ' (payer)' : '' }}</h2>
+              <p>{{ p.share.toFixed(2) }} {{ split.currency }}</p>
+            </ion-label>
+            <ion-badge
+              slot="end"
+              [color]="p.status === 'settled' ? 'success' : 'warning'"
+            >
+              {{ p.status }}
+            </ion-badge>
+          </ion-item>
+        } @empty {
+          <ion-item lines="none">
+            <ion-label color="medium">No participants yet.</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </ion-card>
+  }
+</ion-content>
