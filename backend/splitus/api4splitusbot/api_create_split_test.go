@@ -128,7 +128,34 @@ func TestHandleCreateSplit_Validation(t *testing.T) {
 		{name: "NoParticipants", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","participantContactIDs":[]}`},
 		{name: "EmptyParticipantID", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","participantContactIDs":[""]}`},
 		{name: "DuplicateParticipants", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","participantContactIDs":["cBea","cBea"]}`},
-		{name: "UnsupportedSplitMode", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"percentage","participantContactIDs":["cBea"]}`},
+		{name: "UnsupportedSplitMode", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"shares","participantContactIDs":["cBea"]}`},
+		{name: "ExactAmountMissingShares", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"exact-amount","participantContactIDs":["cBea"]}`},
+		{name: "PercentageMissingShares", body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"percentage","participantContactIDs":["cBea"]}`},
+		{
+			name: "ExactAmountSharesDontSum",
+			body: `{"spaceID":"space1","currency":"EUR","amount":"100.00","splitMode":"exact-amount","participantContactIDs":["cBea","cCam"],` +
+				`"shares":[{"contactID":"","amount":"40.00"},{"contactID":"cBea","amount":"35.00"},{"contactID":"cCam","amount":"24.99"}]}`,
+		},
+		{
+			name: "PercentageSharesDontSum",
+			body: `{"spaceID":"space1","currency":"EUR","amount":"100.00","splitMode":"percentage","participantContactIDs":["cBea","cCam"],` +
+				`"shares":[{"contactID":"","percent":"33.33"},{"contactID":"cBea","percent":"33.33"},{"contactID":"cCam","percent":"33.33"}]}`,
+		},
+		{
+			name: "ExactAmountShareForUnknownContact",
+			body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"exact-amount","participantContactIDs":["cBea"],` +
+				`"shares":[{"contactID":"","amount":"45.00"},{"contactID":"cUnknown","amount":"45.00"}]}`,
+		},
+		{
+			name: "ExactAmountMissingPayerShare",
+			body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"exact-amount","participantContactIDs":["cBea"],` +
+				`"shares":[{"contactID":"cBea","amount":"90.00"}]}`,
+		},
+		{
+			name: "ExactAmountDuplicateShare",
+			body: `{"spaceID":"space1","currency":"EUR","amount":"90.00","splitMode":"exact-amount","participantContactIDs":["cBea"],` +
+				`"shares":[{"contactID":"","amount":"45.00"},{"contactID":"cBea","amount":"20.00"},{"contactID":"cBea","amount":"25.00"}]}`,
+		},
 	}
 
 	defer stubSpaceMembership(t, true)()
@@ -323,6 +350,190 @@ func TestHandleCreateSplit_RemainderCents(t *testing.T) {
 	}
 	if total != 10000 {
 		t.Errorf("shares must sum exactly to 100.00, got %v", total)
+	}
+}
+
+// TestHandleCreateSplit_ExactAmountSplitPostsDebtusTransfers verifies AC
+// splitus#ac:custom-shares-must-sum's happy path: custom exact-amount shares
+// that reconcile exactly to the 100.00 total (40.00/35.00/25.00) are used
+// verbatim — no equal-split remainder logic applies — and post transfers for
+// exactly what each contact was assigned.
+func TestHandleCreateSplit_ExactAmountSplitPostsDebtusTransfers(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+	defer stubNamedUsers(t)()
+	defer stubSplitContacts(t, map[string]string{"cBea": "Bea", "cCam": "Cam"})()
+	var transferInputs []facade4debtus.CreateTransferInput
+	defer stubCreateDebtusTransferCapture(t, &transferInputs)()
+	var capturedBill *models4splitus.BillDbo
+	defer stubCreateBillCapture(t, &capturedBill)()
+
+	w := httptest.NewRecorder()
+	r := makeCreateSplitRequest(`{"spaceID":"space1","title":"Dinner","currency":"EUR","amount":"100.00","splitMode":"exact-amount",` +
+		`"participantContactIDs":["cBea","cCam"],` +
+		`"shares":[{"contactID":"","amount":"40.00"},{"contactID":"cBea","amount":"35.00"},{"contactID":"cCam","amount":"25.00"}]}`)
+	handleCreateSplit(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d — body: %s", w.Code, w.Body.String())
+	}
+
+	if len(transferInputs) != 2 {
+		t.Fatalf("expected 2 transfers, got %d", len(transferInputs))
+	}
+	expectedAmounts := map[string]decimal.Decimal64p2{"cBea": 3500, "cCam": 2500}
+	for i, input := range transferInputs {
+		contactID := input.Request.ToContactID
+		expected, ok := expectedAmounts[contactID]
+		if !ok {
+			t.Errorf("transfers[%d]: unexpected ToContactID %q", i, contactID)
+			continue
+		}
+		delete(expectedAmounts, contactID)
+		if input.Request.Amount.Value != expected {
+			t.Errorf("transfers[%d]: expected amount %v, got %v", i, expected, input.Request.Amount.Value)
+		}
+	}
+	if len(expectedAmounts) != 0 {
+		t.Errorf("missing transfers for contacts: %v", expectedAmounts)
+	}
+
+	if capturedBill == nil {
+		t.Fatal("expected a bill to be persisted")
+	}
+	if capturedBill.SplitMode != models4splitus.SplitModeExactAmount {
+		t.Errorf("expected bill.SplitMode exact-amount, got %q", capturedBill.SplitMode)
+	}
+	var total decimal.Decimal64p2
+	for _, m := range capturedBill.GetBillMembers() {
+		total += m.Owes
+		if m.UserID == "user1" {
+			if m.Owes != 4000 {
+				t.Errorf("expected payer Owes 40.00, got %v", m.Owes)
+			}
+			if m.Paid != 10000 {
+				t.Errorf("expected payer Paid 100.00, got %v", m.Paid)
+			}
+		}
+	}
+	if total != 10000 {
+		t.Errorf("shares must sum exactly to 100.00, got %v", total)
+	}
+}
+
+// TestHandleCreateSplit_ExactAmountSharesDontSum_Rejected verifies AC
+// splitus#ac:custom-shares-must-sum: exact shares that don't sum to the
+// total (99.99 vs 100.00) are rejected with an error naming the discrepancy,
+// and nothing is persisted.
+func TestHandleCreateSplit_ExactAmountSharesDontSum_Rejected(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+	defer stubNamedUsers(t)()
+	defer stubSplitContacts(t, map[string]string{"cBea": "Bea", "cCam": "Cam"})()
+	var transferInputs []facade4debtus.CreateTransferInput
+	defer stubCreateDebtusTransferCapture(t, &transferInputs)()
+	var capturedBill *models4splitus.BillDbo
+	defer stubCreateBillCapture(t, &capturedBill)()
+
+	w := httptest.NewRecorder()
+	r := makeCreateSplitRequest(`{"spaceID":"space1","currency":"EUR","amount":"100.00","splitMode":"exact-amount",` +
+		`"participantContactIDs":["cBea","cCam"],` +
+		`"shares":[{"contactID":"","amount":"40.00"},{"contactID":"cBea","amount":"35.00"},{"contactID":"cCam","amount":"24.99"}]}`)
+	handleCreateSplit(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d — body: %s", w.Code, w.Body.String())
+	}
+	body := w.Body.String()
+	if !strings.Contains(body, "99.99") || !strings.Contains(body, "100.00") {
+		t.Errorf("error should name the discrepancy (99.99 vs 100.00), got: %s", body)
+	}
+	if capturedBill != nil {
+		t.Error("no bill must be created when shares don't sum to the total")
+	}
+	if len(transferInputs) != 0 {
+		t.Errorf("no transfers must be created when shares don't sum to the total, got %d", len(transferInputs))
+	}
+}
+
+// TestHandleCreateSplit_PercentageSharesDontSum_Rejected verifies AC
+// splitus#ac:custom-shares-must-sum: percentages that don't sum to 100%
+// (99.99%) are rejected and nothing is persisted.
+func TestHandleCreateSplit_PercentageSharesDontSum_Rejected(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+	defer stubNamedUsers(t)()
+	defer stubSplitContacts(t, map[string]string{"cBea": "Bea", "cCam": "Cam"})()
+	var transferInputs []facade4debtus.CreateTransferInput
+	defer stubCreateDebtusTransferCapture(t, &transferInputs)()
+	var capturedBill *models4splitus.BillDbo
+	defer stubCreateBillCapture(t, &capturedBill)()
+
+	w := httptest.NewRecorder()
+	r := makeCreateSplitRequest(`{"spaceID":"space1","currency":"EUR","amount":"100.00","splitMode":"percentage",` +
+		`"participantContactIDs":["cBea","cCam"],` +
+		`"shares":[{"contactID":"","percent":"33.33"},{"contactID":"cBea","percent":"33.33"},{"contactID":"cCam","percent":"33.33"}]}`)
+	handleCreateSplit(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d — body: %s", w.Code, w.Body.String())
+	}
+	body := w.Body.String()
+	if !strings.Contains(body, "99.99") {
+		t.Errorf("error should name the discrepancy (percentages sum to 99.99%%), got: %s", body)
+	}
+	if capturedBill != nil {
+		t.Error("no bill must be created when percentages don't sum to 100%")
+	}
+	if len(transferInputs) != 0 {
+		t.Errorf("no transfers must be created when percentages don't sum to 100%%, got %d", len(transferInputs))
+	}
+}
+
+// TestHandleCreateSplit_PercentageSplitLargestRemainder verifies AC
+// splitus#ac:custom-shares-must-sum's rounding requirement: percentages that
+// sum exactly to 100% (33.34/33.33/33.33) but don't divide the 10.00 total
+// evenly in cents are converted via a deterministic largest-remainder rule
+// so the computed amounts still sum EXACTLY to the total — the extra cent
+// goes to the largest percentage (the payer, 33.34%).
+func TestHandleCreateSplit_PercentageSplitLargestRemainder(t *testing.T) {
+	defer stubSpaceMembership(t, true)()
+	defer stubNamedUsers(t)()
+	defer stubSplitContacts(t, map[string]string{"cBea": "Bea", "cCam": "Cam"})()
+	var transferInputs []facade4debtus.CreateTransferInput
+	defer stubCreateDebtusTransferCapture(t, &transferInputs)()
+	var capturedBill *models4splitus.BillDbo
+	defer stubCreateBillCapture(t, &capturedBill)()
+
+	w := httptest.NewRecorder()
+	r := makeCreateSplitRequest(`{"spaceID":"space1","currency":"EUR","amount":"10.00","splitMode":"percentage",` +
+		`"participantContactIDs":["cBea","cCam"],` +
+		`"shares":[{"contactID":"","percent":"33.34"},{"contactID":"cBea","percent":"33.33"},{"contactID":"cCam","percent":"33.33"}]}`)
+	handleCreateSplit(context.Background(), w, r, token4auth.AuthInfo{UserID: "user1"})
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d — body: %s", w.Code, w.Body.String())
+	}
+
+	if len(transferInputs) != 2 {
+		t.Fatalf("expected 2 transfers, got %d", len(transferInputs))
+	}
+	var total decimal.Decimal64p2
+	for i, input := range transferInputs {
+		if input.Request.Amount.Value != 333 {
+			t.Errorf("transfers[%d]: expected amount 3.33, got %v", i, input.Request.Amount.Value)
+		}
+		total += input.Request.Amount.Value
+	}
+	if capturedBill == nil {
+		t.Fatal("expected a bill to be persisted")
+	}
+	if capturedBill.SplitMode != models4splitus.SplitModePercentage {
+		t.Errorf("expected bill.SplitMode percentage, got %q", capturedBill.SplitMode)
+	}
+	for _, m := range capturedBill.GetBillMembers() {
+		if m.UserID == "user1" {
+			if m.Owes != 334 {
+				t.Errorf("expected payer to absorb the remainder cent (3.34) as the largest percentage, got %v", m.Owes)
+			}
+			total += m.Owes
+		}
+	}
+	if total != 1000 {
+		t.Errorf("shares must sum exactly to 10.00, got %v", total)
 	}
 }
 

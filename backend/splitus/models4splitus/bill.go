@@ -176,3 +176,22 @@ func (entity *BillDbo) SetBillMembers(members []*briefs4splitus.BillMemberBrief)
 
 	return
 }
+
+// SetBillMembersWithOwes sets Members after the same structural checks as
+// SetBillMembers (duplicate/basic validation, member ID assignment,
+// UserIDs) but WITHOUT recomputing Owes from entity.SplitMode. Use it when
+// the caller has already computed per-member Owes that reconcile exactly to
+// entity.AmountTotal — e.g. exact-amount and percentage split modes, whose
+// custom shares are reconciled and rounded by the caller rather than by the
+// equal/shares-based calculations in updateMemberOwes.
+func (entity *BillDbo) SetBillMembersWithOwes(members []*briefs4splitus.BillMemberBrief) (err error) {
+	if err = entity.validateMembersForDuplicatesAndBasicChecks(members); err != nil {
+		return
+	}
+
+	entity.Members = members
+
+	entity.setUserIDs(members)
+
+	return
+}

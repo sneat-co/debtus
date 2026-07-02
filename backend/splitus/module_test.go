@@ -15,7 +15,7 @@ func TestModule(t *testing.T) {
 	m := Module()
 	extension.AssertExtension(t, m, extension.Expected{
 		ExtID:         const4splitus.ModuleID,
-		HandlersCount: 3,
+		HandlersCount: 5,
 		DelayersCount: 9,
 	})
 }

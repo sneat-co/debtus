@@ -13,4 +13,6 @@ func InitApiForSplitus(handle strongoapp.HandleHttpWithContext) {
 	// Product endpoints live under /api4splitus/; the legacy /api4debtus/bill-*
 	// routes above are kept untouched.
 	handle(http.MethodPost, "/api4splitus/create-split", api4auth.AuthOnly(handleCreateSplit))
+	handle(http.MethodGet, "/api4splitus/split", api4auth.AuthOnly(handleGetSplit))
+	handle(http.MethodGet, "/api4splitus/splits", api4auth.AuthOnly(handleGetSplits))
 }

@@ -495,6 +495,13 @@ func (transferFacade TransfersFacade) createTransferWithinTransaction(
 
 	transferData := models4debtus.NewTransferData(input.CreatorUser.ID, input.Request.IsReturn, input.Request.Amount, input.From, input.To)
 	transferData.DtCreated = dtCreated
+	// Carry the originating bill's ID onto the transfer so read-side facades
+	// (e.g. splitus's per-participant settled/outstanding read-through) can
+	// look up "which Debtus transfers back this bill" without splitus having
+	// to store its own settled/unsettled state.
+	if input.Request.BillID != "" {
+		transferData.BillIDs = []string{input.Request.BillID}
+	}
 	output.Transfer.Data = transferData
 	input.Source.PopulateTransfer(transferData)
 	if input.Request.Interest != nil {

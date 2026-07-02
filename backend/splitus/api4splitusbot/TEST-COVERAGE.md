@@ -4,7 +4,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Package coverage | 97.8% |
+| Package coverage | 95.7% |
 
 ## Seams added
 
@@ -14,6 +14,8 @@
 - `var createBill = facade4splitus.CreateBill` in `api_bills.go`
 - `var runReadwriteTransaction = facade.RunReadwriteTransaction` in `api_bills.go`
 - `var createDebtusTransfer = facade4debtus.Transfers.CreateTransfer` in `api_create_split.go` — lets tests assert per-participant Debtus transfers without real I/O
+- `var getBillTransfers = func(ctx, spaceID, billID)` in `api_get_splits.go` — loads the Debtus transfers whose `TransferData.BillIDs` contains the bill ID (the reverse of `CreateTransferRequest.BillID` written by `handleCreateSplit`); settled state is DERIVED from these transfers, never stored on the Bill. The production body is also exercised against the in-memory DB (`TestGetBillTransfers_QueriesByBillID`)
+- `var listBillsBySpace = facade4splitus.ListBillsBySpace` in `api_get_splits.go` — list read for `GET /api4splitus/splits`
 
 ## Documented gaps
 
