@@ -20,8 +20,8 @@ import { IContactContext } from '@sneat/extension-contactus-contract';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import {
   CurrencyCode,
+  ICreateSplitRequest,
   SPLITUS_SERVICE,
-  ICreateSplitRecordRequest,
 } from '@sneat/extension-splitus-contract';
 import { ISpaceContext } from '@sneat/space-models';
 
@@ -78,18 +78,22 @@ export class NewSplitFormComponent {
     if (!this.currency.value) {
       throw new Error('currency is not set');
     }
-    const request: ICreateSplitRecordRequest = {
+    // TODO(later task): this form only collects a single contact today; the
+    // full equal/exact/percentage split screen with multiple participants is
+    // a later task. This wiring is kept minimal — one participant, equal
+    // split — just enough to compile against the real createSplit contract.
+    const request: ICreateSplitRequest = {
       spaceID,
-      contactID,
-      amount: this.amount.value,
       currency: this.currency.value,
+      amount: this.amount.value.toFixed(2),
+      participantContactIDs: [contactID],
     };
-    this.splitusService.createSplitRecord(request).subscribe({
+    this.splitusService.createSplit(request).subscribe({
       next: () => {
-        // Split record created successfully
+        // Split created successfully
       },
       error: (err) => {
-        console.error('Failed to create split record:', err);
+        console.error('Failed to create split:', err);
       },
     });
   }

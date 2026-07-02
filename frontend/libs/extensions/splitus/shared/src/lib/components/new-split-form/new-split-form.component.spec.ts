@@ -19,7 +19,7 @@ describe('NewSplitFormComponent', () => {
         },
         {
           provide: SPLITUS_SERVICE,
-          useValue: { createSplitRecord: vi.fn() },
+          useValue: { createSplit: vi.fn(), getSplit: vi.fn(), getSplits: vi.fn() },
         },
       ],
     }).overrideComponent(NewSplitFormComponent, {
