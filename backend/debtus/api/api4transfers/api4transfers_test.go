@@ -17,6 +17,7 @@ import (
 	"github.com/sneat-co/debtus/backend/debtus/facade4debtus"
 	"github.com/sneat-co/debtus/backend/debtus/models4debtus"
 	"github.com/sneat-co/sneat-core-modules/auth/token4auth"
+	"github.com/sneat-co/sneat-core-modules/spaceus/dto4spaceus"
 	"github.com/sneat-co/sneat-core-modules/userus/dal4userus"
 	"github.com/sneat-co/sneat-core-modules/userus/dbo4userus"
 	"github.com/sneat-co/sneat-go-core/apicore"
@@ -521,5 +522,99 @@ func TestHandleCreateTransfer_success_withBalance(t *testing.T) {
 	HandleCreateTransfer(context.Background(), w, makeCreateTransferRequest(validCreateTransferBody()), token4auth.AuthInfo{UserID: "u1"})
 	if w.Code != http.StatusCreated {
 		t.Errorf("expected 201 with balance, got %d; body: %s", w.Code, w.Body.String())
+	}
+}
+
+// ============================================================================
+// buildTransferCounterparties — the fix for the create-path gap: previously
+// HandleCreateTransfer left from/to nil, so NewTransferInput's Validate()
+// always panicked. These tests exercise the From/To construction directly.
+// ============================================================================
+
+func TestBuildTransferCounterparties_UserToCounterparty(t *testing.T) {
+	request := facade4debtus.CreateTransferRequest{
+		SpaceRequest: dto4spaceus.SpaceRequest{SpaceID: "space1"},
+		Direction:    models4debtus.TransferDirectionUser2Counterparty,
+		ToContactID:  "c2",
+		Note:         "lunch money",
+	}
+	from, to, err := buildTransferCounterparties("u1", request)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if from.UserID != "u1" || from.SpaceID != "space1" || from.Note != "lunch money" {
+		t.Errorf("unexpected from: %+v", from)
+	}
+	if to.ContactID != "c2" || to.SpaceID != "space1" {
+		t.Errorf("unexpected to: %+v", to)
+	}
+}
+
+func TestBuildTransferCounterparties_CounterpartyToUser(t *testing.T) {
+	request := facade4debtus.CreateTransferRequest{
+		SpaceRequest:  dto4spaceus.SpaceRequest{SpaceID: "space1"},
+		Direction:     models4debtus.TransferDirectionCounterparty2User,
+		FromContactID: "c1",
+	}
+	from, to, err := buildTransferCounterparties("u1", request)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if from.ContactID != "c1" || from.SpaceID != "space1" {
+		t.Errorf("unexpected from: %+v", from)
+	}
+	if to.UserID != "u1" || to.SpaceID != "space1" {
+		t.Errorf("unexpected to: %+v", to)
+	}
+}
+
+// TestBuildTransferCounterparties_CrossSpace verifies that when the caller
+// supplies CounterpartySpaceID (because the counterparty contact is tracked
+// in a different space than the creator's own), the counterparty side gets
+// that space instead of defaulting to the creator's SpaceID.
+func TestBuildTransferCounterparties_CrossSpace(t *testing.T) {
+	request := facade4debtus.CreateTransferRequest{
+		SpaceRequest:        dto4spaceus.SpaceRequest{SpaceID: "spaceA"},
+		Direction:           models4debtus.TransferDirectionUser2Counterparty,
+		ToContactID:         "c2",
+		CounterpartySpaceID: "spaceB",
+	}
+	from, to, err := buildTransferCounterparties("u1", request)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if from.SpaceID != "spaceA" {
+		t.Errorf("from.SpaceID = %v, want spaceA", from.SpaceID)
+	}
+	if to.SpaceID != "spaceB" {
+		t.Errorf("to.SpaceID = %v, want spaceB (the counterparty's own space)", to.SpaceID)
+	}
+}
+
+func TestBuildTransferCounterparties_UnsupportedDirection(t *testing.T) {
+	request := facade4debtus.CreateTransferRequest{
+		SpaceRequest:  dto4spaceus.SpaceRequest{SpaceID: "space1"},
+		Direction:     models4debtus.TransferDirection3dParty,
+		FromContactID: "c1",
+		ToContactID:   "c2",
+	}
+	_, _, err := buildTransferCounterparties("u1", request)
+	if !errors.Is(err, ErrTransferDirectionNotSupportedByAPI) {
+		t.Errorf("expected ErrTransferDirectionNotSupportedByAPI, got: %v", err)
+	}
+}
+
+// TestHandleCreateTransfer_unsupportedDirection verifies the HTTP handler
+// surfaces buildTransferCounterparties' error (rather than reaching
+// newTransferInputFn/createTransferFn) for a direction it can't resolve.
+func TestHandleCreateTransfer_unsupportedDirection(t *testing.T) {
+	restore := stubVerifyAndCreateUserContext("u1")
+	defer restore()
+
+	body := `{"spaceID":"space1","direction":"3d-party","amount":{"currency":"USD","value":1000},"fromContactID":"c1","toContactID":"c2","billID":"b1"}`
+	w := httptest.NewRecorder()
+	HandleCreateTransfer(context.Background(), w, makeCreateTransferRequest(body), token4auth.AuthInfo{UserID: "u1"})
+	if w.Code == http.StatusCreated {
+		t.Errorf("expected non-201 for unsupported direction, got %d", w.Code)
 	}
 }

@@ -412,18 +412,15 @@ func TestUpdateDebtusSpaceWithTransferInfo(t *testing.T) {
 
 // ============================================================================
 // updateDebtusSpaceAndCounterpartyWithTransferInfo
-// NOTE: debtusSpace.ID is always "debtus" (moduleID) when created via
-// models4debtus.NewDebtusSpaceEntry, but the switch inside the function
-// compares debtusSpace.ID to transfer.Data.From().UserID / To().UserID.
-// To make the function work in tests we must set the ID directly.
+//
+// FIXED (debtus create-path gap): debtusSpace.ID is always const4debtus.ModuleID
+// (e.g. "debtus") when created via models4debtus.NewDebtusSpaceEntry — never a
+// UserID — so the function used to determine "which side is this?" by
+// switching on debtusSpace.ID against transfer.Data.From()/To().UserID, which
+// could never match in real usage (only in tests that overrode .ID as a
+// workaround, see the old newDebtusSpaceEntryWithID helper this replaced).
+// The function now takes an explicit isFromSide bool from the caller instead.
 // ============================================================================
-
-func newDebtusSpaceEntryWithID(id string) models4debtus.DebtusSpaceEntry {
-	e := models4debtus.NewDebtusSpaceEntry(testSpaceID)
-	e.ID = id // override so the switch matches From/To UserID
-	e.Data.Balance = make(money.Balance)
-	return e
-}
 
 func TestUpdateDebtusSpaceAndCounterpartyWithTransferInfo(t *testing.T) {
 	ctx := context.Background()
@@ -437,38 +434,32 @@ func TestUpdateDebtusSpaceAndCounterpartyWithTransferInfo(t *testing.T) {
 	transfer.Data.DtCreated = time.Now()
 
 	t.Run("from_user_perspective", func(t *testing.T) {
-		debtusSpace := newDebtusSpaceEntryWithID("u1") // ID matches From().UserID
+		debtusSpace := newDebtusSpaceEntryWithBalance(testSpaceID)
 		contact := newDebtusSpaceContactEntryWithBalance(testSpaceID, "c2")
 		f := TransfersFacade{}
-		err := f.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, money.NewAmount(money.CurrencyEUR, 100), transfer, debtusSpace, contact, nil)
+		err := f.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, money.NewAmount(money.CurrencyEUR, 100), transfer, debtusSpace, contact, nil, true)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if debtusSpace.Data.CountOfTransfers != 1 {
 			t.Errorf("CountOfTransfers = %d, want 1", debtusSpace.Data.CountOfTransfers)
 		}
-	})
-
-	t.Run("to_user_perspective", func(t *testing.T) {
-		debtusSpace := newDebtusSpaceEntryWithID("u2") // ID matches To().UserID
-		contact := newDebtusSpaceContactEntryWithBalance(testSpaceID, "c1")
-		f := TransfersFacade{}
-		err := f.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, money.NewAmount(money.CurrencyEUR, 100), transfer, debtusSpace, contact, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
+		if v := debtusSpace.Data.Balance[money.CurrencyEUR]; v != 100 {
+			t.Errorf("From side balance = %v, want +100 (userBalanceIncreased)", v)
 		}
 	})
 
-	t.Run("unrelated_debtus_space_panics", func(t *testing.T) {
-		debtusSpace := newDebtusSpaceEntryWithID("u99") // ID matches nothing
+	t.Run("to_user_perspective", func(t *testing.T) {
+		debtusSpace := newDebtusSpaceEntryWithBalance(testSpaceID)
 		contact := newDebtusSpaceContactEntryWithBalance(testSpaceID, "c1")
 		f := TransfersFacade{}
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic for unrelated debtus space")
-			}
-		}()
-		_ = f.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, money.NewAmount(money.CurrencyEUR, 100), transfer, debtusSpace, contact, nil)
+		err := f.updateDebtusSpaceAndCounterpartyWithTransferInfo(ctx, money.NewAmount(money.CurrencyEUR, 100), transfer, debtusSpace, contact, nil, false)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if v := debtusSpace.Data.Balance[money.CurrencyEUR]; v != -100 {
+			t.Errorf("To side balance = %v, want -100 (userBalanceDecreased)", v)
+		}
 	})
 }
 

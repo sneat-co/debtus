@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/crediterra/money"
@@ -56,11 +55,20 @@ func ChangeContactStatus(
 	return
 }
 
+// createContactWithinTransaction creates a new debtus contact for changes.user
+// (the "creator"/appUser side), optionally linking it to a pre-existing
+// counterparty contact (changes.counterparty).
+//
+// Each side has its own space (this is the fix for the "reuses a single
+// spaceID for both sides" gap): the creator's own space is whatever the
+// caller already scoped changes.debtusSpace/changes.contactusSpace to, and
+// the counterparty's contact — which may live in a DIFFERENT space entirely
+// (cross-space linking) — is looked up using changes.counterparty.SpaceID,
+// NOT a single space ID shared with the creator.
 func createContactWithinTransaction(
 	tctx context.Context,
 	tx dal.ReadwriteTransaction,
 	changes *createContactDbChanges,
-	spaceID coretypes.SpaceID,
 	counterpartyUserID string,
 	contactDetails dto4contactus.ContactDetails,
 ) (
@@ -95,7 +103,7 @@ func createContactWithinTransaction(
 	creator.DebtusContact.Data.CreatedBy = appUser.ID
 	if counterparty.Contact.ID != "" {
 		if counterparty.Contact.Data == nil {
-			if counterparty.DebtusContact, err = GetDebtusSpaceContactByID(tctx, tx, spaceID, counterparty.Contact.ID); err != nil {
+			if counterparty.DebtusContact, err = GetDebtusSpaceContactByID(tctx, tx, counterparty.SpaceID, counterparty.Contact.ID); err != nil {
 				return
 			}
 			changes.counterparty.Contact = counterparty.Contact
@@ -211,7 +219,7 @@ func CreateContact(
 				contactusSpace: dal4contactus.NewContactusSpaceEntry(spaceID),
 				counterparty:   ParticipantEntries{},
 			}
-			if err = createContactWithinTransaction(tctx, tx, changes, spaceRequest.SpaceID, "", contactDetails); err != nil {
+			if err = createContactWithinTransaction(tctx, tx, changes, "", contactDetails); err != nil {
 				err = fmt.Errorf("failed to create Contact within transaction: %w", err)
 				return
 			}
@@ -363,7 +371,13 @@ func DeleteContactTx(ctx context.Context, userCtx facade.UserContext, tx dal.Rea
 	if userContact := debtusSpace.Data.Contacts[contactID]; userContact != nil {
 		userContactBalance := userContact.Balance
 		contactBalance := contact.Data.Balance
-		if !reflect.DeepEqual(userContactBalance, contactBalance) {
+		// Use money.Balance.Equal (len+value based) rather than
+		// reflect.DeepEqual: a nil balance and a non-nil-but-empty balance are
+		// equivalent (e.g. a brand new contact created via
+		// models4debtus.NewDebtusSpaceContactEntry always gets a non-nil, empty
+		// Balance map so money.Balanced.AddToBalance() doesn't panic on first
+		// use), and DeepEqual would wrongly flag that as a data-integrity issue.
+		if !userContactBalance.Equal(contactBalance) {
 			return fmt.Errorf("data integrity issue: userContactBalance != contactBalance\n\tuserContactBalance: %v\n\tcontactBalance: %v", userContactBalance, contactBalance)
 		}
 		delete(debtusSpace.Data.Contacts, contactID)

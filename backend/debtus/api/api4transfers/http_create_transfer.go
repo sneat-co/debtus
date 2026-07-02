@@ -2,6 +2,7 @@ package api4transfers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -26,11 +27,50 @@ var (
 	}
 )
 
+// ErrTransferDirectionNotSupportedByAPI is returned when the HTTP
+// create-transfer endpoint is asked to create a transfer whose direction it
+// does not know how to resolve into From/To counterparties (currently only
+// TransferDirectionUser2Counterparty and TransferDirectionCounterparty2User
+// are supported — the "I lent" / "I borrowed" cases driven by the
+// authenticated caller).
+var ErrTransferDirectionNotSupportedByAPI = errors.New("transfer direction not supported by this endpoint")
+
+// buildTransferCounterparties builds the From/To TransferCounterpartyInfo
+// pair for a CreateTransferRequest, using selfUserID (the authenticated
+// caller) for whichever side represents them.
+//
+// The counterparty side's ContactID is resolved against
+// request.CounterpartySpaceIDOrDefault(): ordinarily the counterparty's
+// contact record lives in the same space as the creator (SpaceID), but for
+// cross-space lending the caller can supply CounterpartySpaceID explicitly.
+func buildTransferCounterparties(selfUserID string, request facade4debtus.CreateTransferRequest) (from, to *models4debtus.TransferCounterpartyInfo, err error) {
+	counterpartySpaceID := request.CounterpartySpaceIDOrDefault()
+	self := &models4debtus.TransferCounterpartyInfo{
+		UserID:  selfUserID,
+		SpaceID: request.SpaceID,
+		Note:    request.Note,
+	}
+	switch request.Direction {
+	case models4debtus.TransferDirectionUser2Counterparty:
+		from = self
+		to = &models4debtus.TransferCounterpartyInfo{ContactID: request.ToContactID, SpaceID: counterpartySpaceID}
+	case models4debtus.TransferDirectionCounterparty2User:
+		to = self
+		from = &models4debtus.TransferCounterpartyInfo{ContactID: request.FromContactID, SpaceID: counterpartySpaceID}
+	default:
+		err = fmt.Errorf("%w: %v", ErrTransferDirectionNotSupportedByAPI, request.Direction)
+	}
+	return
+}
+
 func HandleCreateTransfer(ctx context.Context, w http.ResponseWriter, r *http.Request, authInfo token4auth.AuthInfo) {
 	var request facade4debtus.CreateTransferRequest
 	apicore.HandleAuthenticatedRequestWithBody(w, r, &request, verify.DefaultJsonWithAuthRequired, http.StatusCreated,
 		func(ctx facade.ContextWithUser) (interface{}, error) {
-			var from, to *models4debtus.TransferCounterpartyInfo
+			from, to, err := buildTransferCounterparties(authInfo.UserID, request)
+			if err != nil {
+				return nil, err
+			}
 
 			appUser, err := dal4userus.GetUserByID(ctx, nil, authInfo.UserID)
 			if err != nil {

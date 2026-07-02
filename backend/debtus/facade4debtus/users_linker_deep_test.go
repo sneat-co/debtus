@@ -256,7 +256,7 @@ func TestCreateContactWithinTransaction_CounterpartyPath(t *testing.T) {
 
 	var got error
 	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		got = createContactWithinTransaction(ctx, tx, changes, testSpaceID, "", dto4contactus.ContactDetails{NameFields: person.NameFields{FirstName: "Bob"}})
+		got = createContactWithinTransaction(ctx, tx, changes, "", dto4contactus.ContactDetails{NameFields: person.NameFields{FirstName: "Bob"}})
 		return nil
 	}, dal.TxWithCrossGroup())
 

@@ -169,13 +169,17 @@ func (linker *usersLinker) getOrCreateInvitedContactByInviterUserAndInviterConta
 		createContactDbChanges := &createContactDbChanges{
 			user: changes.invited.user,
 			counterparty: ParticipantEntries{
-				User:          changes.invited.user,
+				User: changes.invited.user,
+				// SpaceID is the counterparty's OWN space — the inviter's
+				// contact record lives in inviter.spaceID, which may differ
+				// from the invited user's own space (cross-space linking).
+				SpaceID:       inviter.spaceID,
 				Contact:       changes.inviter.contact,
 				DebtusSpace:   changes.inviter.debtusSpace,
 				DebtusContact: changes.inviter.debtusContact,
 			},
 		}
-		if err = createContactWithinTransaction(tctx, tx, createContactDbChanges, inviter.spaceID, inviter.user.ID, invitedContactDetails); err != nil {
+		if err = createContactWithinTransaction(tctx, tx, createContactDbChanges, inviter.user.ID, invitedContactDetails); err != nil {
 			return
 		}
 		//if changes.inviter.contact.ID == "" {

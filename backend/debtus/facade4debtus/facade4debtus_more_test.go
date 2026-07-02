@@ -75,7 +75,7 @@ func TestCreateContactWithinTransaction_NoCounterparty_HappyPath(t *testing.T) {
 
 	var got error
 	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		got = createContactWithinTransaction(ctx, tx, changes, testSpaceID, "", details)
+		got = createContactWithinTransaction(ctx, tx, changes, "", details)
 		return nil
 	}, dal.TxWithCrossGroup())
 
@@ -107,7 +107,7 @@ func TestCreateContactWithinTransaction_NilTx(t *testing.T) {
 		user:        dbo4userus.NewUserEntry("u1"),
 		debtusSpace: models4debtus.NewDebtusSpaceEntry(testSpaceID),
 	}
-	err := createContactWithinTransaction(context.Background(), nil, changes, testSpaceID, "u2", dto4contactus.ContactDetails{})
+	err := createContactWithinTransaction(context.Background(), nil, changes, "u2", dto4contactus.ContactDetails{})
 	if err == nil || err.Error() != "tx == nil" {
 		t.Errorf("expected 'tx == nil' error, got: %v", err)
 	}
@@ -127,7 +127,7 @@ func TestCreateContactWithinTransaction_AppUserDataNil(t *testing.T) {
 	}
 	var got error
 	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		got = createContactWithinTransaction(ctx, tx, changes, testSpaceID, "u2", dto4contactus.ContactDetails{})
+		got = createContactWithinTransaction(ctx, tx, changes, "u2", dto4contactus.ContactDetails{})
 		return nil
 	}, dal.TxWithCrossGroup())
 	if got == nil || got.Error() != "appUser.Data == nil" {

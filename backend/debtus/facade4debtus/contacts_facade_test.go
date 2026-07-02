@@ -43,7 +43,7 @@ func TestCreateContactWithinTransaction_consistencyAsserts(t *testing.T) {
 		db := sneattesting.SetupMemoryDB(t)
 		var got error
 		_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-			got = createContactWithinTransaction(ctx, tx, changes, testSpaceID, counterpartyUserID, dto4contactus.ContactDetails{})
+			got = createContactWithinTransaction(ctx, tx, changes, counterpartyUserID, dto4contactus.ContactDetails{})
 			// Always return nil so the tx wrapper does not swallow got.
 			return nil
 		}, dal.TxWithCrossGroup())
