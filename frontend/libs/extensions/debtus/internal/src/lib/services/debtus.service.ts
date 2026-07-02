@@ -10,9 +10,8 @@ import {
   ISettleUpRequest,
   apiDirectionToDebtDirection,
   debtDirectionToApiDirection,
-  settleDirectionForBalance,
 } from '@sneat/extension-debtus-contract';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, of, throwError } from 'rxjs';
 import { DEMO_CONTACT_BALANCES, demoTransfersForSpace } from './demo-data';
 
 // Backend DTO shapes (facade4debtus/dto4debtus). Only the fields the UI reads
@@ -105,7 +104,7 @@ export class DebtusService implements IDebtusService {
   // REAL endpoints below.
   // ===========================================================================
 
-  /** REAL: GET /api4debtus/transfer?id= (live; falls back to demo on error). */
+  /** Reads from demo fixtures; unknown ids error (no fabricated receipts). */
   public getTransfer(
     spaceID: string,
     transferID: string,
@@ -118,23 +117,37 @@ export class DebtusService implements IDebtusService {
     //   return this.sneatApiService
     //     .get<IApiTransferDto>('api4debtus/transfer', params)
     //     .pipe(map((dto) => this.mapTransferDto(dto, spaceID)));
-    void spaceID;
     const found = demoTransfersForSpace(spaceID).find(
       (t) => t.id === transferID,
     );
-    return of(
-      found ?? {
-        id: transferID,
-        direction: 'lend',
-        amount: { currency: 'USD', value: 0 },
-        counterpartyContactID: '',
-        counterpartyTitle: 'Unknown',
-        created: new Date().toISOString(),
-        isReturn: false,
-        isOutstanding: true,
-        creatorSpaceID: spaceID,
-      },
-    );
+    // Fable refactoring: a transfer that is not in the fixtures (i.e. any
+    // REAL transfer just created via POST create-transfer) must be an error,
+    // not a fabricated "Unknown / 0.00 USD / Outstanding" receipt — that was
+    // presenting fiction as a financial record. The create/settle pages now
+    // hand the created transfer to the details page via router state, so this
+    // path is only hit on cold loads of unknown ids. The old synthesized
+    // fallback is kept below (commented out) per the no-delete policy:
+    //   return of(
+    //     found ?? {
+    //       id: transferID,
+    //       direction: 'lend',
+    //       amount: { currency: 'USD', value: 0 },
+    //       counterpartyContactID: '',
+    //       counterpartyTitle: 'Unknown',
+    //       created: new Date().toISOString(),
+    //       isReturn: false,
+    //       isOutstanding: true,
+    //       creatorSpaceID: spaceID,
+    //     },
+    //   );
+    return found
+      ? of(found)
+      : throwError(
+          () =>
+            new Error(
+              `Transfer "${transferID}" was not found (transfer reads are not wired to the live backend yet).`,
+            ),
+        );
   }
 
   /** REAL: POST /api4debtus/create-transfer (Firebase-authenticated). */
@@ -153,6 +166,12 @@ export class DebtusService implements IDebtusService {
       // c2u (borrow) the counterparty is the source (fromContactID).
       toContactID: apiDirection === 'u2c' ? request.contactID : undefined,
       fromContactID: apiDirection === 'c2u' ? request.contactID : undefined,
+      // The backend CreateTransferRequest accepts both `note` and
+      // `counterpartySpaceID` (facade4debtus/transfers_create_transfer_dto.go);
+      // omitting them silently discarded the user's typed note and the
+      // cross-space marker on a financial write.
+      note: request.note,
+      counterpartySpaceID: request.counterpartySpaceID || undefined,
       isReturn: request.isReturn ?? false,
       returnToTransferID: request.returnToTransferID,
       dueOn: request.dueOn,
@@ -168,14 +187,19 @@ export class DebtusService implements IDebtusService {
   public settleUp(
     request: ISettleUpRequest,
   ): Observable<ICreateTransferResponse> {
-    // Determine the direction that moves the balance toward zero. We infer it
-    // from the sign of the current balance for this contact's currency; the
-    // backend nets the return against outstanding transfers.
-    const contact = DEMO_CONTACT_BALANCES.find(
-      (c) => c.contactID === request.contactID,
-    );
-    const currentValue = contact?.balance[request.amount.currency] ?? 0;
-    const direction = settleDirectionForBalance(currentValue || 1);
+    // Fable refactoring: the direction now comes from the request — the page
+    // that shows the balance derives it via `settleDirectionForBalance` and is
+    // the source of truth. Previously it was inferred from DEMO_CONTACT_BALANCES
+    // fixtures, so any contact NOT in the fixtures got `'borrow'`
+    // unconditionally and settling a debt the user owed recorded the WRONG
+    // direction, increasing the imbalance. Old fixture-based inference kept
+    // below per the no-delete policy:
+    //   const contact = DEMO_CONTACT_BALANCES.find(
+    //     (c) => c.contactID === request.contactID,
+    //   );
+    //   const currentValue = contact?.balance[request.amount.currency] ?? 0;
+    //   const direction = settleDirectionForBalance(currentValue || 1);
+    const direction = request.direction;
     return this.createTransfer({
       spaceID: request.spaceID,
       direction,

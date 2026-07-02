@@ -159,12 +159,20 @@ export class NewTransferPageComponent extends SpacePageBaseComponent {
         title: this.counterpartyName.value,
       };
     }
-    const name = this.counterpartyName.value.trim();
-    if (name) {
-      // New counterparty by name (mirrors the bot's "new counterparty" step).
-      // No contactID yet — the backend create flow resolves/creates it.
-      return { contactID: '', title: name };
-    }
+    // Fable refactoring: the "new counterparty by name" path is disabled —
+    // the assumption that "the backend create flow resolves/creates it" was
+    // wrong: POST create-transfer validation requires toContactID/fromContactID
+    // (facade4debtus CreateTransferRequest.Validate), so an empty contactID
+    // always 400s. Until a create-contact-then-transfer flow is wired, users
+    // must pick an existing space contact (the picker above supports adding
+    // one). Original branch kept per the no-delete policy:
+    //   const name = this.counterpartyName.value.trim();
+    //   if (name) {
+    //     // New counterparty by name (mirrors the bot's "new counterparty"
+    //     // step). No contactID yet — the backend create flow
+    //     // resolves/creates it.
+    //     return { contactID: '', title: name };
+    //   }
     return null;
   }
 
@@ -176,7 +184,10 @@ export class NewTransferPageComponent extends SpacePageBaseComponent {
     }
     const counterparty = this.resolveCounterparty();
     if (!counterparty) {
-      this.showToast('Pick a contact or enter a counterparty name.', 'danger');
+      this.showToast(
+        'Pick a counterparty contact. To record against someone new, add them as a space contact first.',
+        'danger',
+      );
       return;
     }
     const spaceID = this.$spaceID();
@@ -198,11 +209,14 @@ export class NewTransferPageComponent extends SpacePageBaseComponent {
       next: (resp) => {
         this.$submitting.set(false);
         // Navigation default: go to the created transfer's detail, replaceUrl
-        // so Back doesn't reopen the filled form.
+        // so Back doesn't reopen the filled form. The created transfer is
+        // handed over via router state — transfer reads are not wired to the
+        // live backend yet, so the details page must not fabricate a receipt
+        // from fixtures.
         this.spaceNav.navigateForwardToSpacePage(
           this.space,
           `transfer/${resp.transfer.id}`,
-          { replaceUrl: true },
+          { replaceUrl: true, state: { transfer: resp.transfer } },
         );
       },
       error: (err) => {

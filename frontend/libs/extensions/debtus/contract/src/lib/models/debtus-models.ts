@@ -105,4 +105,11 @@ export interface ISettleUpRequest {
   readonly contactTitle?: string;
   readonly amount: IAmount;
   readonly counterpartySpaceID?: string;
+  /**
+   * Direction of the settling transfer, derived by the caller from the signed
+   * balance it is settling (see `settleDirectionForBalance`). The page showing
+   * the balance is the source of truth; the service must not re-derive it from
+   * demo fixtures or it can record the wrong direction for real contacts.
+   */
+  readonly direction: DebtDirection;
 }

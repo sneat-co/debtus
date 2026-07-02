@@ -22,6 +22,7 @@ import {
   IonToolbar,
   ToastController,
 } from '@ionic/angular/standalone';
+import { DemoDataBannerComponent } from '../../components/demo-data-banner/demo-data-banner.component';
 import {
   DEBTUS_SERVICE,
   IContactBalance,
@@ -41,6 +42,7 @@ import { combineLatest, switchMap } from 'rxjs';
   selector: 'sneat-debtus-contact-details-page',
   templateUrl: './debtus-contact-details-page.component.html',
   imports: [
+    DemoDataBannerComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

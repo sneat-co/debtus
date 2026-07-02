@@ -19,6 +19,7 @@ import {
   IonSpinner,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { DemoDataBannerComponent } from '../../components/demo-data-banner/demo-data-banner.component';
 import {
   DEBTUS_SERVICE,
   IBalanceSummary,
@@ -44,6 +45,7 @@ import { switchMap } from 'rxjs';
   selector: 'sneat-debtus-home-page',
   templateUrl: './debtus-home-page.component.html',
   imports: [
+    DemoDataBannerComponent,
     SpacePageTitleComponent,
     SpaceServiceModule,
     IonHeader,
