@@ -4,9 +4,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Pre-run coverage | 0.0% |
-| Post-run coverage | 100.0% |
-| Uncovered statements remaining | 0 |
+| Package coverage | 97.8% |
 
 ## Seams added
 
@@ -15,7 +13,11 @@
 - `var getUsersByIDs = dal4userus.GetUsersByIDs` in `api_bills.go`
 - `var createBill = facade4splitus.CreateBill` in `api_bills.go`
 - `var runReadwriteTransaction = facade.RunReadwriteTransaction` in `api_bills.go`
+- `var createDebtusTransfer = facade4debtus.Transfers.CreateTransfer` in `api_create_split.go` — lets tests assert per-participant Debtus transfers without real I/O
 
 ## Documented gaps
 
-None — 100% statement coverage achieved.
+- `handleCreateSplit`: two defensive branches are not exercised — the
+  `SetBillMembers` error return (unreachable with named members and a valid
+  equal split) and the `CreateTransferInput.Validate()` error return
+  (unreachable for inputs the handler itself constructs).

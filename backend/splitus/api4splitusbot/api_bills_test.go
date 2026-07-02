@@ -546,6 +546,7 @@ func TestInitApiForSplitus(t *testing.T) {
 	expected := []routeKey{
 		{http.MethodPost, "/api4debtus/bill-create"},
 		{http.MethodGet, "/api4debtus/bill-get"},
+		{http.MethodPost, "/api4splitus/create-split"},
 	}
 	for _, e := range expected {
 		if !registered[e] {
