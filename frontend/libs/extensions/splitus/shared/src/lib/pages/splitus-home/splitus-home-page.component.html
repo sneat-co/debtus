@@ -27,4 +27,43 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
+
+  <ion-card>
+    @if ($loading()) {
+      <ion-card-content>
+        <ion-spinner name="dots" />
+      </ion-card-content>
+    } @else if ($error()) {
+      <ion-card-content>
+        <ion-note color="danger">{{ $error() }}</ion-note>
+      </ion-card-content>
+    } @else if ($splits().length) {
+      <ion-list>
+        @for (s of $splits(); track s.id) {
+          <ion-item button (click)="openSplit(s.id)">
+            <ion-label>
+              <h2>{{ s.title || 'Split' }}</h2>
+              <p>
+                {{ s.amount.toFixed(2) }} {{ s.currency }} ·
+                {{ formatMemberCount(s.membersCount) }}
+              </p>
+            </ion-label>
+            <ion-badge slot="end" [color]="statusColor(s.status)">{{
+              s.status
+            }}</ion-badge>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <ion-card-content class="ion-text-center">
+        <ion-note color="medium">No splits yet.</ion-note>
+        <div class="ion-margin-top">
+          <ion-button (click)="goNewSplit()">
+            <ion-icon name="add" slot="start" />
+            Create your first split
+          </ion-button>
+        </div>
+      </ion-card-content>
+    }
+  </ion-card>
 </ion-content>

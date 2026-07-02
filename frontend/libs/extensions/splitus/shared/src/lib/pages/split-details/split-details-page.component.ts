@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonBackButton,
   IonBadge,
+  IonButton,
   IonButtons,
   IonCard,
   IonCardContent,
@@ -18,19 +19,22 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ISplit, SPLITUS_SERVICE } from '@sneat/extension-splitus-contract';
+import { ISplit, ISplitParticipant, SPLITUS_SERVICE } from '@sneat/extension-splitus-contract';
 import {
   SpaceComponentBaseParams,
   SpacePageBaseComponent,
 } from '@sneat/space-components';
 import { ClassName } from '@sneat/ui';
 import { combineLatest, switchMap } from 'rxjs';
+import { settleInDebtusUrl, statusColor } from '../split-status-view';
 
-// Minimal split details page — the landing target of the create-split
-// redirect (flows.md: a create flow must exit onto a real screen). Shows the
-// split title/total and its raw participant list from getSplit; the full
-// details experience is a later task. Loads from the :splitID in the URL, so
-// deep links and refreshes work without router state.
+// Split details — per-participant shares with settled/outstanding read
+// straight from getSplit (splitus#ac:settle-up-single-source-of-truth: no
+// client-side settled logic or storage), plus a "Settle in Debtus" link on
+// outstanding rows. Loads by the :splitID in the URL, so deep links and
+// refreshes work without router state. Entry: the splits list
+// (splitus-home-page) and new-split's post-create redirect. Exit: back to
+// `splits`, or out to debtus.app to actually settle.
 @Component({
   selector: 'sneat-splitus-split-details-page',
   templateUrl: './split-details-page.component.html',
@@ -50,6 +54,7 @@ import { combineLatest, switchMap } from 'rxjs';
     IonLabel,
     IonNote,
     IonBadge,
+    IonButton,
     IonSpinner,
   ],
   providers: [
@@ -63,6 +68,8 @@ export class SplitDetailsPageComponent extends SpacePageBaseComponent {
   protected readonly $loading = signal(true);
   protected readonly $error = signal<string | undefined>(undefined);
   protected readonly $split = signal<ISplit | undefined>(undefined);
+
+  protected readonly statusColor = statusColor;
 
   constructor() {
     super();
@@ -90,5 +97,13 @@ export class SplitDetailsPageComponent extends SpacePageBaseComponent {
           });
         },
       });
+  }
+
+  protected settleUrl(participant: ISplitParticipant): string | undefined {
+    return settleInDebtusUrl(
+      participant,
+      this.$spaceType(),
+      this.$spaceID(),
+    );
   }
 }

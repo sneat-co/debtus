@@ -29,7 +29,10 @@
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        Total: {{ split.amount.toFixed(2) }} {{ split.currency }}
+        <p>Total: {{ split.amount.toFixed(2) }} {{ split.currency }}</p>
+        <ion-badge [color]="statusColor(split.status)">{{
+          split.status
+        }}</ion-badge>
       </ion-card-content>
     </ion-card>
 
@@ -44,12 +47,24 @@
               <h2>{{ p.name }}{{ p.isPayer ? ' (payer)' : '' }}</h2>
               <p>{{ p.share.toFixed(2) }} {{ split.currency }}</p>
             </ion-label>
-            <ion-badge
-              slot="end"
-              [color]="p.status === 'settled' ? 'success' : 'warning'"
-            >
-              {{ p.status }}
-            </ion-badge>
+            <div slot="end" class="ion-text-end">
+              <ion-badge [color]="statusColor(p.status)">{{
+                p.status
+              }}</ion-badge>
+              @if (settleUrl(p); as url) {
+                <div class="ion-margin-top">
+                  <ion-button
+                    [href]="url"
+                    target="_blank"
+                    rel="noopener"
+                    size="small"
+                    fill="outline"
+                  >
+                    Settle in Debtus
+                  </ion-button>
+                </div>
+              }
+            </div>
           </ion-item>
         } @empty {
           <ion-item lines="none">
